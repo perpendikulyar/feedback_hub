@@ -1,6 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Record } from './record.entity';
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
@@ -9,6 +9,8 @@ import { SystemUser } from '../auth/system-user.entity';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {
+  private readonly logger = new Logger('RecordRepository');
+
   async getRecords(
     getRecordsFilterDto: GetRecordsFilterDto,
     systemUser: SystemUser,
@@ -51,9 +53,10 @@ export class RecordRepository extends Repository<Record> {
 
     try {
       const records: Record[] = await query.getMany();
-
+      this.logger.verbose('Records successfuly served');
       return records;
     } catch (error) {
+      this.logger.error('Failed on getting all records', error.stack);
       throw new InternalServerErrorException();
     }
   }
@@ -80,8 +83,18 @@ export class RecordRepository extends Repository<Record> {
 
       delete record.creator;
       delete record.systemUser;
+
+      this.logger.verbose(
+        `New record successfuly created by creator: ${JSON.stringify(creator)}`,
+      );
       return record;
     } catch (error) {
+      this.logger.error(
+        `Failed on creting new record with data: ${JSON.stringify(
+          createRecordDto,
+        )}; and creator: ${JSON.stringify(creator)}`,
+        error.stack,
+      );
       throw new InternalServerErrorException();
     }
   }

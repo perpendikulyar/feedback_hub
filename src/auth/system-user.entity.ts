@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Record } from '../records/record.entity';
+import { Creator } from '../creators/creator.entity';
 import {
   Entity,
   Unique,
@@ -31,4 +32,7 @@ export class SystemUser extends BaseEntity {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
   }
+
+  @OneToMany(type => Creator, creator => creator.systemUser, { eager: true })
+  creators: Creator[];
 }

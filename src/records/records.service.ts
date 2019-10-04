@@ -13,9 +13,12 @@ import { Creator } from 'src/creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class RecordsService {
+  private readonly logger = new Logger('RecordsService');
+
   constructor(
     @InjectRepository(RecordRepository)
     private recordRepository: RecordRepository,
@@ -36,6 +39,7 @@ export class RecordsService {
   ): Promise<Record> {
     const creator: Creator = await this.creatorsService.mergeCreator(
       userCookie,
+      systemUser,
     );
     return await this.recordRepository.createRecord(
       createrecordDto,
@@ -50,9 +54,11 @@ export class RecordsService {
     });
 
     if (!found) {
+      this.logger.verbose(`Record with ID ${id} not found`);
       throw new NotFoundException(`Record with ID ${id} not found`);
     }
 
+    this.logger.verbose(`Record with ID ${id} successfuly found`);
     return found;
   }
 
@@ -63,7 +69,10 @@ export class RecordsService {
     });
 
     if (result.affected === 0) {
+      this.logger.verbose(`Record with ID ${id} not found`);
       throw new NotFoundException(`Record with ID ${id} not found`);
+    } else {
+      this.logger.verbose(`Record with ID ${id} successfuly deleted`);
     }
   }
 
@@ -77,6 +86,7 @@ export class RecordsService {
     const record: Record = await this.getRecordById(id, systemUser);
 
     if (!status && !type) {
+      this.logger.warn('No properties to updete are declareted');
       throw new BadRequestException('No properties to updete are declareted');
     }
 
@@ -92,8 +102,19 @@ export class RecordsService {
 
     try {
       await record.save();
+      this.logger.verbose(
+        `Record with ID ${id} successfuly updated with new data ${JSON.stringify(
+          updateRecordDto,
+        )}`,
+      );
       return record;
     } catch (error) {
+      this.logger.error(
+        `Failed on update record with id: ${id}; sended data was: ${JSON.stringify(
+          UpdateRecordDto,
+        )}`,
+        error.stack,
+      );
       throw new InternalServerErrorException();
     }
   }
