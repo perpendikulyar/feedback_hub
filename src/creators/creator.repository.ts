@@ -11,44 +11,13 @@ import { SystemUser } from '../auth/system-user.entity';
 export class CreatorRepository extends Repository<Creator> {
   private readonly logger = new Logger('CreatorRepository');
 
-  async getCreatorByUserCookie(
-    userCookie: string,
-    systemUser: SystemUser,
-  ): Promise<Creator> {
-    const query = this.createQueryBuilder('creator');
-
-    query.where(
-      'creator.userCookie = :userCookie AND  creator.systemUserId = :systemUserId',
-      { userCookie, systemUserId: systemUser.id },
-    );
-
-    try {
-      const creator = await query.getOne();
-
-      if (!creator) {
-        this.logger.verbose('Creator not found');
-      } else {
-        this.logger.verbose(`Creator successfuly found`);
-        return creator;
-      }
-    } catch (error) {
-      this.logger.error(
-        `Failed on find creator with cookie "${userCookie}" for system user ${
-          systemUser.username
-        }.`,
-        error.stack,
-      );
-      throw new InternalServerErrorException();
-    }
-  }
-
   async createCreator(
-    userCookie: string,
+    creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
     const creator = new Creator();
 
-    creator.userCookie = userCookie;
+    creator.creatorHash = creatorHash;
     creator.systemUser = systemUser;
 
     try {
@@ -59,7 +28,7 @@ export class CreatorRepository extends Repository<Creator> {
       return creator;
     } catch (error) {
       this.logger.error(
-        `Failed on adding new creator with cookie "${userCookie}" for system user ${
+        `Failed on adding new creator with cookie "${creatorHash}" for system user ${
           systemUser.username
         }.`,
         error.stack,

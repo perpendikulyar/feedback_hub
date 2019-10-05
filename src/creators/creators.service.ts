@@ -13,43 +13,47 @@ export class CreatorsService {
     private creatorRepository: CreatorRepository,
   ) {}
 
-  async getCreatorByUserCookie(
-    userCookie: string,
+  async getCreatorByCreatorHash(
+    creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
     this.logger.verbose(
       `System User "${systemUser.username}" trying to found a creator`,
     );
-    return await this.creatorRepository.getCreatorByUserCookie(
-      userCookie,
-      systemUser,
-    );
+    try {
+      return await this.creatorRepository.findOne({
+        creatorHash,
+        systemUserId: systemUser.id,
+      });
+    } catch (error) {
+      this.logger.error('Failed on finding creator', error.stack);
+    }
   }
 
   async createCreator(
-    userCookie: string,
+    creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
     this.logger.verbose(
       `System User "${systemUser.username}" trying to create new creator`,
     );
-    return await this.creatorRepository.createCreator(userCookie, systemUser);
+    return await this.creatorRepository.createCreator(creatorHash, systemUser);
   }
 
   async mergeCreator(
-    userCookie: string,
+    creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
     this.logger.verbose(
       `System User "${systemUser.username}" runing "merge creators"`,
     );
-    const existCreator = await this.getCreatorByUserCookie(
-      userCookie,
+    const existCreator = await this.getCreatorByCreatorHash(
+      creatorHash,
       systemUser,
     );
 
     if (!existCreator) {
-      const newCreator = await this.createCreator(userCookie, systemUser);
+      const newCreator = await this.createCreator(creatorHash, systemUser);
       return newCreator;
     } else {
       return existCreator;

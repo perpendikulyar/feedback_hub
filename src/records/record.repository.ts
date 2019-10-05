@@ -6,6 +6,8 @@ import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
 import { SystemUser } from '../auth/system-user.entity';
+import { Request } from 'express';
+import * as request from 'supertest';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {
@@ -80,7 +82,7 @@ export class RecordRepository extends Repository<Record> {
       const tillDate = updatedEndDate ? updatedEndDate : new Date();
 
       this.logger.debug(
-        `Filtering cration date. from: ${fromDate}; till: ${tillDate}`,
+        `Filtering updated date. from: ${fromDate}; till: ${tillDate}`,
       );
       query.andWhere(
         'record.creationDate >= :fromDate AND record.creationDate <= :tillDate',
@@ -92,7 +94,9 @@ export class RecordRepository extends Repository<Record> {
     }
 
     try {
-      const records: Record[] = await query.orderBy('record.id').getMany();
+      const records: Record[] = await query
+        .orderBy('record.id', 'DESC')
+        .getMany();
       this.logger.verbose('Records successfuly served');
       return records;
     } catch (error) {
@@ -105,6 +109,7 @@ export class RecordRepository extends Repository<Record> {
     createRecordDto: CreateRecordDto,
     creator: Creator,
     systemUser: SystemUser,
+    req: Request,
   ): Promise<Record> {
     const { title, description, type } = createRecordDto;
 
@@ -117,6 +122,8 @@ export class RecordRepository extends Repository<Record> {
     record.type = type;
     record.creator = creator;
     record.systemUser = systemUser;
+    record.creatorIp = req.connection.remoteAddress;
+    record.creatorUserAgent = req.get('User-Agent');
 
     try {
       await record.save();

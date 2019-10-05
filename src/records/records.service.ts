@@ -4,16 +4,18 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { RecordRepository } from './record.repository';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { CreatorsService } from '../creators/creators.service';
 import { Creator } from 'src/creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Logger } from '@nestjs/common';
+import { Request } from 'express';
+import * as request from 'supertest';
 
 @Injectable()
 export class RecordsService {
@@ -22,7 +24,6 @@ export class RecordsService {
   constructor(
     @InjectRepository(RecordRepository)
     private recordRepository: RecordRepository,
-    private creatorsService: CreatorsService,
   ) {}
 
   getRecords(
@@ -34,17 +35,15 @@ export class RecordsService {
 
   async createRecord(
     createrecordDto: CreateRecordDto,
-    userCookie: string,
+    creator: Creator,
     systemUser: SystemUser,
+    req: Request,
   ): Promise<Record> {
-    const creator: Creator = await this.creatorsService.mergeCreator(
-      userCookie,
-      systemUser,
-    );
     return await this.recordRepository.createRecord(
       createrecordDto,
       creator,
       systemUser,
+      req,
     );
   }
 

@@ -11,43 +11,58 @@ import {
   Delete,
   Patch,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { RecordsService } from './records.service';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { UserCookieValidationPipe } from '../creators/pipes/user-cookie-validation.pipe';
+import { CreatorHashValidationPipe } from '../creators/pipes/creator-hash-validation.pipe';
 import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GetSystemUser } from '../auth/get-system-user.decorator';
 import { SystemUser } from '../auth/system-user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { Logger } from '@nestjs/common';
+import { CreatorsService } from '../creators/creators.service';
+import { Creator } from 'src/creators/creator.entity';
 
 @Controller('records')
 @UseGuards(AuthGuard())
 export class RecordsController {
   private readonly logger = new Logger('RecordsController');
 
-  constructor(private recordsService: RecordsService) {}
+  constructor(
+    private recordsService: RecordsService,
+    private creatorsService: CreatorsService,
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
-  createRecord(
+  async createRecord(
     @Body() createRecordDto: CreateRecordDto,
-    @Body('userCookie', UserCookieValidationPipe) userCookie: string,
+    @Body('creatorHash', CreatorHashValidationPipe) creatorHash: string,
     @GetSystemUser() systemUser: SystemUser,
+    @Req() req: Request,
   ): Promise<Record> {
     this.logger.verbose(
       `User "${
         systemUser.username
       }" trying to create new record with data: ${JSON.stringify(
         createRecordDto,
-      )}; and creator cookie: ${userCookie}`,
+      )}; and creator hash: ${creatorHash}`,
     );
+
+    const creator: Creator = await this.creatorsService.mergeCreator(
+      creatorHash,
+      systemUser,
+    );
+
     return this.recordsService.createRecord(
       createRecordDto,
-      userCookie,
+      creator,
       systemUser,
+      req,
     );
   }
 

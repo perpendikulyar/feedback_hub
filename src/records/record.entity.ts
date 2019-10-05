@@ -46,4 +46,10 @@ export class Record extends BaseEntity {
 
   @Column()
   systemUserId: number;
+
+  @Column()
+  creatorIp: string;
+
+  @Column()
+  creatorUserAgent: string;
 }

@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToMany,
   ManyToOne,
 } from 'typeorm';
 import { Record } from '../records/record.entity';
@@ -16,7 +15,7 @@ export class Creator extends BaseEntity {
   id: number;
 
   @Column()
-  userCookie: string;
+  creatorHash: string;
 
   @OneToMany(type => Record, record => record.creator, { eager: true })
   records: Record[];
