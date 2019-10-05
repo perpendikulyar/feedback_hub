@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { SystemUser } from './system-user.entity';
-import { userInfo } from 'os';
+import * as bcrypt from 'bcryptjs';
 
 const mockCredentialsDto = {
   username: 'TestUsername',
@@ -91,6 +91,19 @@ describe('SystemUserRepository', () => {
       );
       expect(systemUser.validatePassword).toHaveBeenCalled();
       expect(result).toBeNull();
+    });
+  });
+
+  describe('hashPassword', () => {
+    it('Calls bcrypt.hash to generate hash', async () => {
+      bcrypt.hash = jest.fn().mockResolvedValue('testHash');
+      expect(bcrypt.hash).not.toHaveBeenCalled();
+      const result = await systemUserRepository.hashPassword(
+        'testPassword',
+        'testSalt',
+      );
+      expect(bcrypt.hash).toHaveBeenCalledWith('testPassword', 'testSalt');
+      expect(result).toEqual('testHash');
     });
   });
 });
