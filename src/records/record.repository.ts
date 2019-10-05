@@ -7,7 +7,6 @@ import { Creator } from '../creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Request } from 'express';
-import * as request from 'supertest';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {
@@ -85,7 +84,7 @@ export class RecordRepository extends Repository<Record> {
         `Filtering updated date. from: ${fromDate}; till: ${tillDate}`,
       );
       query.andWhere(
-        'record.creationDate >= :fromDate AND record.creationDate <= :tillDate',
+        'record.lastUpdateDate >= :fromDate AND record.lastUpdateDate <= :tillDate',
         {
           fromDate,
           tillDate,
@@ -118,7 +117,7 @@ export class RecordRepository extends Repository<Record> {
     record.description = description;
     record.status = RecordStatus.NEW;
     record.creationDate = new Date();
-    record.lastUpdatedDate = new Date();
+    record.lastUpdateDate = new Date();
     record.type = type;
     record.creator = creator;
     record.systemUser = systemUser;

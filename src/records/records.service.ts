@@ -15,7 +15,6 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Logger } from '@nestjs/common';
 import { Request } from 'express';
-import * as request from 'supertest';
 
 @Injectable()
 export class RecordsService {
@@ -97,7 +96,7 @@ export class RecordsService {
       record.type = type;
     }
 
-    record.lastUpdatedDate = new Date();
+    record.lastUpdateDate = new Date();
 
     try {
       await record.save();
