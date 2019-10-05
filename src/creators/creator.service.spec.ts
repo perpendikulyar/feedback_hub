@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { CreatorsService } from './creators.service';
 import { CreatorRepository } from './creator.repository';
 import { SystemUser } from '../auth/system-user.entity';
-import { async } from 'rxjs/internal/scheduler/async';
 
 const mockSystemUser = new SystemUser();
 

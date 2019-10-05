@@ -1,10 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Creator } from './creator.entity';
-import {
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { SystemUser } from '../auth/system-user.entity';
 
 @EntityRepository(Creator)
@@ -15,8 +11,7 @@ export class CreatorRepository extends Repository<Creator> {
     creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
-    const creator = new Creator();
-
+    const creator = this.create();
     creator.creatorHash = creatorHash;
     creator.systemUser = systemUser;
 
