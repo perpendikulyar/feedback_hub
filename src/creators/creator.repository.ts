@@ -11,7 +11,7 @@ import { SystemUser } from '../auth/system-user.entity';
 export class CreatorRepository extends Repository<Creator> {
   private readonly logger = new Logger('CreatorRepository');
 
-  async createCreator(
+  async addCreator(
     creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
