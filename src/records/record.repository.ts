@@ -20,8 +20,10 @@ export class RecordRepository extends Repository<Record> {
       creatorId,
       searchQuery,
       type,
-      startDate,
-      endDate,
+      creationStartDate,
+      creationEndDate,
+      updatedStartDate,
+      updatedEndDate,
     } = getRecordsFilterDto;
 
     const query = this.createQueryBuilder('record');
@@ -49,10 +51,48 @@ export class RecordRepository extends Repository<Record> {
       );
     }
 
-    // @todo make period filter
+    if (
+      (creationStartDate && creationEndDate) ||
+      creationStartDate ||
+      creationEndDate
+    ) {
+      const fromDate = creationStartDate ? creationStartDate : new Date(0);
+      const tillDate = creationEndDate ? creationEndDate : new Date();
+
+      this.logger.debug(
+        `Filtering cration date. from: ${fromDate}; till: ${tillDate}`,
+      );
+      query.andWhere(
+        'record.creationDate >= :fromDate AND record.creationDate <= :tillDate',
+        {
+          fromDate,
+          tillDate,
+        },
+      );
+    }
+
+    if (
+      (updatedStartDate && creationEndDate) ||
+      updatedStartDate ||
+      updatedEndDate
+    ) {
+      const fromDate = updatedStartDate ? updatedStartDate : new Date(0);
+      const tillDate = updatedEndDate ? updatedEndDate : new Date();
+
+      this.logger.debug(
+        `Filtering cration date. from: ${fromDate}; till: ${tillDate}`,
+      );
+      query.andWhere(
+        'record.creationDate >= :fromDate AND record.creationDate <= :tillDate',
+        {
+          fromDate,
+          tillDate,
+        },
+      );
+    }
 
     try {
-      const records: Record[] = await query.getMany();
+      const records: Record[] = await query.orderBy('record.id').getMany();
       this.logger.verbose('Records successfuly served');
       return records;
     } catch (error) {

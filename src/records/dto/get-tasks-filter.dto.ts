@@ -32,9 +32,17 @@ export class GetRecordsFilterDto {
 
   @IsOptional()
   @IsNotEmpty()
-  startDate: Date;
+  creationStartDate: Date;
 
   @IsOptional()
   @IsNotEmpty()
-  endDate: Date;
+  creationEndDate: Date;
+
+  @IsOptional()
+  @IsNotEmpty()
+  updatedStartDate: Date;
+
+  @IsOptional()
+  @IsNotEmpty()
+  updatedEndDate: Date;
 }

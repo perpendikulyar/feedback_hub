@@ -27,10 +27,10 @@ export class Record extends BaseEntity {
   @Column()
   type: RecordType;
 
-  @Column()
+  @Column('timestamptz')
   creationDate: Date;
 
-  @Column()
+  @Column('timestamptz')
   lastUpdatedDate: Date;
 
   @ManyToOne(type => Creator, creator => creator.records, { eager: false })
