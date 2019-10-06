@@ -4,7 +4,7 @@ import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
-import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
+import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Request } from 'express';
 
@@ -112,7 +112,7 @@ export class RecordRepository extends Repository<Record> {
   ): Promise<Record> {
     const { title, description, type } = createRecordDto;
 
-    const record = new Record();
+    const record = this.create();
     record.title = title;
     record.description = description;
     record.status = RecordStatus.NEW;

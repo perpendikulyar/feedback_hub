@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Record } from '../records/record.entity';
 import { Creator } from '../creators/creator.entity';
 import {

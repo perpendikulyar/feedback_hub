@@ -22,22 +22,24 @@ export class CreatorsService {
     );
     try {
       return await this.creatorRepository.findOne({
-        creatorHash,
-        systemUserId: systemUser.id,
+        where: {
+          creatorHash,
+          systemUserId: systemUser.id,
+        },
       });
     } catch (error) {
       this.logger.error('Failed on finding creator', error.stack);
     }
   }
 
-  async createCreator(
+  async addCreator(
     creatorHash: string,
     systemUser: SystemUser,
   ): Promise<Creator> {
     this.logger.verbose(
       `System User "${systemUser.username}" trying to create new creator`,
     );
-    return await this.creatorRepository.createCreator(creatorHash, systemUser);
+    return await this.creatorRepository.addCreator(creatorHash, systemUser);
   }
 
   async mergeCreator(
@@ -47,14 +49,14 @@ export class CreatorsService {
     this.logger.verbose(
       `System User "${systemUser.username}" runing "merge creators"`,
     );
+
     const existCreator = await this.getCreatorByCreatorHash(
       creatorHash,
       systemUser,
     );
 
     if (!existCreator) {
-      const newCreator = await this.createCreator(creatorHash, systemUser);
-      return newCreator;
+      return await this.addCreator(creatorHash, systemUser);
     } else {
       return existCreator;
     }

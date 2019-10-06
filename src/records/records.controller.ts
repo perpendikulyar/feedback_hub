@@ -18,7 +18,7 @@ import { RecordsService } from './records.service';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { CreatorHashValidationPipe } from '../creators/pipes/creator-hash-validation.pipe';
-import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
+import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GetSystemUser } from '../auth/get-system-user.decorator';
 import { SystemUser } from '../auth/system-user.entity';

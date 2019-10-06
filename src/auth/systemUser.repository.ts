@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { SystemUser } from './system-user.entity';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Logger } from '@nestjs/common';
 import {
   ConflictException,
@@ -15,7 +15,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto;
 
-    const systemUser = new SystemUser();
+    const systemUser = this.create();
     systemUser.username = username;
     systemUser.salt = await bcrypt.genSalt();
     systemUser.password = await this.hashPassword(password, systemUser.salt);
