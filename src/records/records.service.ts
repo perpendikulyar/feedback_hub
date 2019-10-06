@@ -10,7 +10,7 @@ import { RecordRepository } from './record.repository';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { Creator } from 'src/creators/creator.entity';
-import { GetRecordsFilterDto } from './dto/get-tasks-filter.dto';
+import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Logger } from '@nestjs/common';
@@ -33,13 +33,13 @@ export class RecordsService {
   }
 
   async createRecord(
-    createrecordDto: CreateRecordDto,
+    createRecordDto: CreateRecordDto,
     creator: Creator,
     systemUser: SystemUser,
     req: Request,
   ): Promise<Record> {
     return await this.recordRepository.createRecord(
-      createrecordDto,
+      createRecordDto,
       creator,
       systemUser,
       req,
