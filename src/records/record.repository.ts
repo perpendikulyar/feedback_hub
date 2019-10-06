@@ -112,7 +112,7 @@ export class RecordRepository extends Repository<Record> {
   ): Promise<Record> {
     const { title, description, type } = createRecordDto;
 
-    const record = new Record();
+    const record = this.create();
     record.title = title;
     record.description = description;
     record.status = RecordStatus.NEW;
