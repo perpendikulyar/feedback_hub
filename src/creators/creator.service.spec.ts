@@ -13,6 +13,10 @@ const mockCreatorRepository = () => ({
   findOne: jest.fn(),
 });
 
+const mockCreator = { creatorHash: 'testHash' };
+
+const mockCreatorHash = 'testHash';
+
 describe('CreatorsService', () => {
   let creatorsService: CreatorsService;
   let creatorRepository;
@@ -31,13 +35,12 @@ describe('CreatorsService', () => {
 
   describe('getCreatorByCreatorHash', () => {
     it('Get creator by Creator Hash from creator repository', async () => {
-      const mockCreator = { creatorHash: 'testHash' };
       creatorRepository.findOne.mockResolvedValue(mockCreator);
 
       expect(creatorRepository.findOne).not.toHaveBeenCalled();
 
       const result = await creatorsService.getCreatorByCreatorHash(
-        'testHash',
+        mockCreatorHash,
         mockSystemUser,
       );
       expect(creatorRepository.findOne).toHaveBeenCalledWith({
@@ -52,13 +55,52 @@ describe('CreatorsService', () => {
       creatorRepository.addCreator.mockResolvedValue('newCreator');
 
       expect(creatorRepository.addCreator).not.toHaveBeenCalled();
-      const cratorHash = 'testHash';
       const result = await creatorsService.addCreator(
-        cratorHash,
+        mockCreatorHash,
         mockSystemUser,
       );
       expect(creatorRepository.addCreator).toHaveBeenCalled();
       expect(result).toEqual('newCreator');
+    });
+  });
+
+  describe('mergeCreator', () => {
+    it('Try to run creatorService.getCreatorByCreatirHash', async () => {
+      spyOn(creatorsService, 'getCreatorByCreatorHash').and.returnValue(
+        Promise.resolve(mockCreator),
+      );
+      spyOn(creatorsService, 'addCreator');
+
+      const result = await creatorsService.mergeCreator(
+        mockCreatorHash,
+        mockSystemUser,
+      );
+      expect(creatorsService.getCreatorByCreatorHash).toHaveBeenCalledWith(
+        mockCreatorHash,
+        mockSystemUser,
+      );
+      expect(creatorsService.addCreator).not.toHaveBeenCalled();
+      expect(result).toEqual(mockCreator);
+    });
+
+    it('should call `addCreator`', async () => {
+      spyOn(creatorsService, 'getCreatorByCreatorHash').and.returnValue(
+        Promise.resolve(undefined),
+      );
+      spyOn(creatorsService, 'addCreator').and.returnValue(
+        Promise.resolve(mockCreator),
+      );
+
+      const result = await creatorsService.mergeCreator(
+        mockCreatorHash,
+        mockSystemUser,
+      );
+
+      expect(creatorsService.addCreator).toHaveBeenCalledWith(
+        mockCreatorHash,
+        mockSystemUser,
+      );
+      expect(result).toEqual(mockCreator);
     });
   });
 });

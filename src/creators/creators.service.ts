@@ -49,14 +49,14 @@ export class CreatorsService {
     this.logger.verbose(
       `System User "${systemUser.username}" runing "merge creators"`,
     );
+
     const existCreator = await this.getCreatorByCreatorHash(
       creatorHash,
       systemUser,
     );
 
     if (!existCreator) {
-      const newCreator = await this.addCreator(creatorHash, systemUser);
-      return newCreator;
+      return await this.addCreator(creatorHash, systemUser);
     } else {
       return existCreator;
     }
