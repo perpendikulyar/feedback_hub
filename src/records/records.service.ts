@@ -3,6 +3,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,9 +14,9 @@ import { Creator } from 'src/creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
-import { Logger } from '@nestjs/common';
 import { Request } from 'express';
 import { SystemUserRole } from '../auth/system-user-role.enum';
+import { DeleteResult } from 'typeorm';
 
 @Injectable()
 export class RecordsService {
@@ -69,12 +70,12 @@ export class RecordsService {
       throw new NotFoundException();
     }
 
-    const result = await this.recordRepository.delete({
+    const result: DeleteResult = await this.recordRepository.delete({
       id,
       systemUserId: systemUser.id,
     });
 
-    if (result.affected === 0) {
+    if (result && result.affected === 0) {
       this.logger.verbose(`Record with ID ${id} not found`);
       throw new NotFoundException(`Record with ID ${id} not found`);
     } else {

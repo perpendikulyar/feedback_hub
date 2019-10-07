@@ -10,6 +10,7 @@ import { Creator } from '../creators/creator.entity';
 import { Request } from 'express';
 import { Record } from './record.entity';
 import { NotFoundException } from '@nestjs/common';
+import { SystemUserRole } from '../auth/system-user-role.enum';
 
 describe('RecordsService', () => {
   let recordsService: RecordsService;
@@ -20,6 +21,7 @@ describe('RecordsService', () => {
     createRecord: jest.fn(),
     findOne: jest.fn(),
     delete: jest.fn(),
+    update: jest.fn(),
   });
 
   const mockRecord = new Record();
@@ -30,6 +32,7 @@ describe('RecordsService', () => {
   const mockSystemUser = new SystemUser();
   mockSystemUser.id = 1;
   mockSystemUser.username = 'TestUsername';
+  mockSystemUser.role = SystemUserRole.API_USER;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -120,6 +123,8 @@ describe('RecordsService', () => {
 
   describe('deleteRecord', () => {
     it('Should call recordRepository.delete and successfully delete a record', async () => {
+      mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
+
       recordRepository.delete.mockResolvedValue({ affected: 1 });
       await recordsService.deleteRecord(1, mockSystemUser);
       expect(recordRepository.delete).toHaveBeenCalledWith({
@@ -129,8 +134,16 @@ describe('RecordsService', () => {
     });
 
     it('Should call recordRepository.delete and returs NotFoundException', () => {
+      mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
       recordRepository.delete.mockResolvedValue({ affected: 0 });
 
+      expect(recordsService.deleteRecord(1, mockSystemUser)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('Should return NotFoundError if user is not a super_admin', async () => {
+      mockSystemUser.role = SystemUserRole.API_USER;
       expect(recordsService.deleteRecord(1, mockSystemUser)).rejects.toThrow(
         NotFoundException,
       );
