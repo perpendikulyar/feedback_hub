@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import { Record } from '../records/record.entity';
 import { Creator } from '../creators/creator.entity';
+import { SystemUserRole } from './system-user-role.enum';
 import {
   Entity,
   Unique,
@@ -8,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -24,6 +26,19 @@ export class SystemUser extends BaseEntity {
 
   @Column()
   salt: string;
+
+  @CreateDateColumn()
+  creationDate: Date;
+
+  @Column()
+  lastAuthDate: Date;
+
+  @Column({
+    type: 'enum',
+    enum: SystemUserRole,
+    default: SystemUserRole.API_USER,
+  })
+  role: SystemUserRole;
 
   @OneToMany(type => Record, record => record.systemUser, { eager: true })
   records: Record[];

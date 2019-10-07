@@ -4,6 +4,8 @@ import { SystemUserRepository } from './systemUser.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
+import { SystemUser } from './system-user.entity';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,8 +17,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.systemUserRepository.signUp(authCredentialsDto);
+  async createSystemUser(
+    createSystemUserDto: CreateSystemUserDto,
+  ): Promise<void> {
+    return this.systemUserRepository.createSystemUser(createSystemUserDto);
   }
 
   async signIn(
@@ -33,6 +37,10 @@ export class AuthService {
 
     const payload: JwtPayload = { username };
     const accessToken = this.jwtService.sign(payload);
+
+    await this.systemUserRepository.update(username, {
+      lastAuthDate: new Date(),
+    });
 
     this.logger.debug(
       `Generated JWT token with payload "${JSON.stringify(payload)}"`,

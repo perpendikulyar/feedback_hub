@@ -1,6 +1,5 @@
 import { SystemUser } from './system-user.entity';
 import * as bcrypt from 'bcryptjs';
-import { async } from 'rxjs/internal/scheduler/async';
 
 describe('SystemUser entity', () => {
   let systemUser: SystemUser;

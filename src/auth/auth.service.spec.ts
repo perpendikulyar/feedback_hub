@@ -3,6 +3,8 @@ import { SystemUserRepository } from './systemUser.repository';
 import { Test } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
+import { SystemUserRole } from './system-user-role.enum';
 
 describe('Auth Service', () => {
   let authService: AuthService;
@@ -11,7 +13,8 @@ describe('Auth Service', () => {
 
   const mockSystemUserRepository = () => ({
     validatePassword: jest.fn(),
-    signUp: jest.fn(),
+    createSystemUser: jest.fn(),
+    update: jest.fn(),
   });
 
   const mockCredentialsDto = {
@@ -42,13 +45,20 @@ describe('Auth Service', () => {
     );
   });
 
-  describe('signUp', () => {
-    it('Should call systemUserRepository.signUp', async () => {
-      systemUserRepository.signUp.mockResolvedValue(undefined);
+  describe('createSystemUSer', () => {
+    it('Should call systemUserRepository.createSystemUser', async () => {
+      const mockCreateSystemUserDto = new CreateSystemUserDto();
+      mockCreateSystemUserDto.username = 'TestUser';
+      mockCreateSystemUserDto.password = 'Password';
+      mockCreateSystemUserDto.role = SystemUserRole.API_USER;
 
-      const result = await authService.signUp(mockCredentialsDto);
-      expect(systemUserRepository.signUp).toHaveBeenCalledWith(
-        mockCredentialsDto,
+      systemUserRepository.createSystemUser.mockResolvedValue(undefined);
+
+      const result = await authService.createSystemUser(
+        mockCreateSystemUserDto,
+      );
+      expect(systemUserRepository.createSystemUser).toHaveBeenCalledWith(
+        mockCreateSystemUserDto,
       );
       expect(result).toBe(undefined);
     });
@@ -62,6 +72,7 @@ describe('Auth Service', () => {
       spyOn(jwtService, 'sign').and.returnValue(mockAccessToken);
 
       const result = await authService.signIn(mockCredentialsDto);
+      expect(systemUserRepository.update).toHaveBeenCalled();
       expect(result).toEqual({ accessToken: mockAccessToken });
     });
 

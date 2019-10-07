@@ -1,6 +1,17 @@
-import { Controller, Post, Body, ValidationPipe, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  ValidationPipe,
+  Logger,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetSystemUser } from './get-system-user.decorator';
+import { SystemUser } from './system-user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -8,14 +19,18 @@ export class AuthController {
 
   constructor(private authService: AuthService) {}
 
-  @Post('/signup')
-  signUp(
-    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
+  @Post('/createUser')
+  @UseGuards(AuthGuard())
+  createSystemUser(
+    @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,
+    @GetSystemUser() user: SystemUser,
   ): Promise<void> {
     this.logger.verbose(
-      `Trying creating new user with username "${authCredentialsDto.username}"`,
+      `Trying creating new user with username "${
+        createSystemUserDto.username
+      }"`,
     );
-    return this.authService.signUp(authCredentialsDto);
+    return this.authService.createSystemUser(createSystemUserDto);
   }
 
   @Post('/signin')

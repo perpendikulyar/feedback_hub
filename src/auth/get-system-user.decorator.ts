@@ -1,4 +1,4 @@
-import { createParamDecorator, Body } from '@nestjs/common';
+import { createParamDecorator } from '@nestjs/common';
 import { SystemUser } from './system-user.entity';
 
 export const GetSystemUser = createParamDecorator(

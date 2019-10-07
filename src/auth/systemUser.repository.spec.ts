@@ -6,11 +6,18 @@ import {
 } from '@nestjs/common';
 import { SystemUser } from './system-user.entity';
 import * as bcrypt from 'bcryptjs';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
+import { SystemUserRole } from './system-user-role.enum';
 
 const mockCredentialsDto = {
   username: 'TestUsername',
   password: 'TestPassword',
 };
+
+const mockCreateSystemUserDto = new CreateSystemUserDto();
+mockCreateSystemUserDto.username = 'TestUser';
+mockCreateSystemUserDto.password = 'Password';
+mockCreateSystemUserDto.role = SystemUserRole.API_USER;
 
 describe('SystemUserRepository', () => {
   let systemUserRepository;
@@ -25,7 +32,7 @@ describe('SystemUserRepository', () => {
     );
   });
 
-  describe('signUp', () => {
+  describe('createSystemUserRepository', () => {
     let save;
 
     beforeEach(() => {
@@ -35,22 +42,22 @@ describe('SystemUserRepository', () => {
     it('successfully signs up the user', () => {
       save.mockResolvedValue(undefined);
       expect(
-        systemUserRepository.signUp(mockCredentialsDto),
+        systemUserRepository.createSystemUser(mockCreateSystemUserDto),
       ).resolves.not.toThrow();
     });
 
     it('Throws a conflict error as username already exist', () => {
       save.mockRejectedValue({ code: '23505' });
-      expect(systemUserRepository.signUp(mockCredentialsDto)).rejects.toThrow(
-        ConflictException,
-      );
+      expect(
+        systemUserRepository.createSystemUser(mockCreateSystemUserDto),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('throws a internal server error while creatin a new system user', () => {
       save.mockRejectedValue({ code: '123123' }); // unhandled error code
-      expect(systemUserRepository.signUp(mockCredentialsDto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      expect(
+        systemUserRepository.createSystemUser(mockCreateSystemUserDto),
+      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 

@@ -3,6 +3,7 @@ import { SystemUser } from './system-user.entity';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcryptjs';
 import { Logger } from '@nestjs/common';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import {
   ConflictException,
   InternalServerErrorException,
@@ -12,13 +13,16 @@ import {
 export class SystemUserRepository extends Repository<SystemUser> {
   private readonly logger = new Logger('SystemUserRepository');
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const { username, password } = authCredentialsDto;
+  async createSystemUser(
+    createSystemUserDto: CreateSystemUserDto,
+  ): Promise<void> {
+    const { username, password, role } = createSystemUserDto;
 
     const systemUser = this.create();
     systemUser.username = username;
     systemUser.salt = await bcrypt.genSalt();
     systemUser.password = await this.hashPassword(password, systemUser.salt);
+    systemUser.role = role;
 
     try {
       await systemUser.save();
@@ -30,7 +34,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
       } else {
         this.logger.error(
           `Failed on creatin new user with credentials: ${JSON.stringify(
-            authCredentialsDto,
+            createSystemUserDto,
           )}`,
           error.stack,
         );

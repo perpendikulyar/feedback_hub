@@ -5,7 +5,6 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordType } from './record-type.enum';
 import { Test } from '@nestjs/testing';
 import { RecordRepository } from './record.repository';
-import { RecordStatus } from './record-status.enum';
 
 describe('RecordRepository', () => {
   let recordRepository;
