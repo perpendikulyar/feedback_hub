@@ -45,4 +45,8 @@ export class GetRecordsFilterDto {
   @IsOptional()
   @IsNotEmpty()
   updatedEndDate: Date;
+
+  @IsOptional()
+  @IsNotEmpty()
+  page: number;
 }

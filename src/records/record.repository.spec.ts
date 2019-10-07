@@ -78,7 +78,6 @@ describe('RecordRepository', () => {
       const result = await recordRepository.getRecords(
         mockGetRecordsFilterDto,
         mockSystemUser,
-        1,
       );
 
       expect(result).toEqual([mockRecord, mockRecord]);

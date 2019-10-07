@@ -69,7 +69,6 @@ export class RecordsController {
   @Get()
   getRecords(
     @Query(ValidationPipe) getRecordsFilterDto: GetRecordsFilterDto,
-    @Query('page', ParseIntPipe) page: number,
     @GetSystemUser() systemUser: SystemUser,
   ): Promise<Record[]> {
     this.logger.verbose(
@@ -79,11 +78,7 @@ export class RecordsController {
         getRecordsFilterDto,
       )}`,
     );
-    return this.recordsService.getRecords(
-      getRecordsFilterDto,
-      systemUser,
-      page,
-    );
+    return this.recordsService.getRecords(getRecordsFilterDto, systemUser);
   }
 
   @Get('/:id')
