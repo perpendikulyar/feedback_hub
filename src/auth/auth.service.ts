@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SystemUserRepository } from './systemUser.repository';
 import { JwtService } from '@nestjs/jwt';
@@ -6,6 +11,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
 import { SystemUser } from './system-user.entity';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
+import { SystemUserRole } from './system-user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +25,28 @@ export class AuthService {
 
   async createSystemUser(
     createSystemUserDto: CreateSystemUserDto,
+    systemUser: SystemUser,
   ): Promise<void> {
-    return this.systemUserRepository.createSystemUser(createSystemUserDto);
+    /* this statement could be deleted after app succsessfully running some time */
+    if (
+      process.env.NODE_ENV === 'production' &&
+      (await this.systemUserRepository.count()) > 0
+    ) {
+      this.logger.log(systemUser);
+      if (systemUser && systemUser.role === SystemUserRole.SUPER_ADMIN) {
+        this.logger.verbose(
+          `User ${systemUser.username} trying to create new user`,
+        );
+        return this.systemUserRepository.createSystemUser(createSystemUserDto);
+      } else {
+        this.logger.verbose(
+          `Someone trying to reach creating new user service`,
+        );
+        throw new NotFoundException();
+      }
+    } else {
+      return this.systemUserRepository.createSystemUser(createSystemUserDto);
+    }
   }
 
   async signIn(
@@ -38,11 +64,12 @@ export class AuthService {
     const payload: JwtPayload = { username };
     const accessToken = this.jwtService.sign(payload);
 
-    await this.systemUserRepository.update(username, {
-      lastAuthDate: new Date(),
-    });
+    await this.systemUserRepository.update(
+      { username },
+      { lastAuthDate: new Date() },
+    );
 
-    this.logger.debug(
+    this.logger.verbose(
       `Generated JWT token with payload "${JSON.stringify(payload)}"`,
     );
     return { accessToken };

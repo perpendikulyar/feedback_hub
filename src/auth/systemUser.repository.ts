@@ -22,6 +22,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
     systemUser.username = username;
     systemUser.salt = await bcrypt.genSalt();
     systemUser.password = await this.hashPassword(password, systemUser.salt);
+    systemUser.lastAuthDate = new Date();
     systemUser.role = role;
 
     try {
@@ -50,7 +51,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
     const systemUser = await this.findOne({ username });
 
     if (systemUser && (await systemUser.validatePassword(password))) {
-      this.logger.verbose('Successfuly sign in');
+      this.logger.verbose(`Successfuly sign in`);
       return systemUser.username;
     } else {
       return null;

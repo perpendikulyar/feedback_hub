@@ -19,18 +19,17 @@ export class AuthController {
 
   constructor(private authService: AuthService) {}
 
-  @Post('/createUser')
-  @UseGuards(AuthGuard())
+  @Post('/createSystemUser')
   createSystemUser(
     @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,
-    @GetSystemUser() user: SystemUser,
+    @GetSystemUser() systemUser: SystemUser,
   ): Promise<void> {
     this.logger.verbose(
       `Trying creating new user with username "${
         createSystemUserDto.username
       }"`,
     );
-    return this.authService.createSystemUser(createSystemUserDto);
+    return this.authService.createSystemUser(createSystemUserDto, systemUser);
   }
 
   @Post('/signin')

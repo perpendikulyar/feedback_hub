@@ -15,6 +15,7 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../auth/system-user.entity';
 import { Logger } from '@nestjs/common';
 import { Request } from 'express';
+import { SystemUserRole } from '../auth/system-user-role.enum';
 
 @Injectable()
 export class RecordsService {
@@ -61,6 +62,13 @@ export class RecordsService {
   }
 
   async deleteRecord(id: number, systemUser: SystemUser): Promise<void> {
+    if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
+      this.logger.verbose(
+        `User ${systemUser.username} trying to delete record id: ${id}`,
+      );
+      throw new NotFoundException();
+    }
+
     const result = await this.recordRepository.delete({
       id,
       systemUserId: systemUser.id,
