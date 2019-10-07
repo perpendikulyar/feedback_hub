@@ -93,14 +93,12 @@ export class RecordsService {
     const record: Record = await this.getRecordById(id, systemUser);
 
     if (!status && !type) {
-      this.logger.warn('No properties to updete are declareted');
+      this.logger.verbose('No properties to updete are declareted');
       throw new BadRequestException('No properties to updete are declareted');
     }
-
     if (status) {
       record.status = status;
     }
-
     if (type) {
       record.type = type;
     }

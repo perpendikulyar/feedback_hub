@@ -9,8 +9,9 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { Creator } from '../creators/creator.entity';
 import { Request } from 'express';
 import { Record } from './record.entity';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { SystemUserRole } from '../auth/system-user-role.enum';
+import { UpdateRecordDto } from './dto/update-record.dto';
 
 describe('RecordsService', () => {
   let recordsService: RecordsService;
@@ -28,6 +29,7 @@ describe('RecordsService', () => {
   mockRecord.id = 10;
   mockRecord.title = 'TestTitle';
   mockRecord.description = 'TestDesc';
+  mockRecord.save = jest.fn();
 
   const mockSystemUser = new SystemUser();
   mockSystemUser.id = 1;
@@ -147,6 +149,41 @@ describe('RecordsService', () => {
       expect(recordsService.deleteRecord(1, mockSystemUser)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('Update record', () => {
+    it('Should successfully update record', async () => {
+      const mockUpdateRecordDto = new UpdateRecordDto();
+      mockUpdateRecordDto.status = RecordStatus.SKIPPED;
+      mockUpdateRecordDto.type = RecordType.LIKES;
+
+      spyOn(recordsService, 'getRecordById').and.returnValue(mockRecord);
+
+      const result = await recordsService.updateRecord(
+        12,
+        mockUpdateRecordDto,
+        mockSystemUser,
+      );
+
+      expect(recordsService.getRecordById).toHaveBeenCalledWith(
+        12,
+        mockSystemUser,
+      );
+
+      expect(mockRecord.save).toHaveBeenCalled();
+
+      expect(result).toEqual(mockRecord);
+    });
+
+    it('Should returns BadRequestException with recived empty Dto', () => {
+      const emptyUpdateRecordDto = new UpdateRecordDto();
+
+      spyOn(recordsService, 'getRecordById').and.returnValue(mockRecord);
+
+      expect(
+        recordsService.updateRecord(12, emptyUpdateRecordDto, mockSystemUser),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
