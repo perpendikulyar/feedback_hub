@@ -115,7 +115,6 @@ export class RecordRepository extends Repository<Record> {
     const record = this.create();
     record.title = title;
     record.description = description;
-    record.status = RecordStatus.NEW;
     record.type = type;
     record.creator = creator;
     record.systemUser = systemUser;

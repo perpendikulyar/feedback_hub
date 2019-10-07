@@ -23,10 +23,18 @@ export class Record extends BaseEntity {
   @Column()
   description: string;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: RecordStatus,
+    default: RecordStatus.NEW,
+  })
   status: RecordStatus;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: RecordType,
+    default: RecordType.NOTSET,
+  })
   type: RecordType;
 
   @CreateDateColumn()
