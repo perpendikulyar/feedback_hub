@@ -15,6 +15,7 @@ export class RecordRepository extends Repository<Record> {
   async getRecords(
     getRecordsFilterDto: GetRecordsFilterDto,
     systemUser: SystemUser,
+    page: number,
   ): Promise<Record[]> {
     const {
       status,
@@ -27,11 +28,19 @@ export class RecordRepository extends Repository<Record> {
       updatedEndDate,
     } = getRecordsFilterDto;
 
+    page = page ? page : 1;
+
+    const recordsPerPage = 10;
+
     const query = this.createQueryBuilder('record');
 
     query.where('record.systemUserId = :systemUserId', {
       systemUserId: systemUser.id,
     });
+
+    query.take(page * recordsPerPage);
+
+    query.skip(page * recordsPerPage - recordsPerPage);
 
     if (status) {
       query.andWhere('record.status = :status', { status });

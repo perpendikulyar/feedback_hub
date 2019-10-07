@@ -30,8 +30,13 @@ export class RecordsService {
   getRecords(
     getRecordsFilterDto: GetRecordsFilterDto,
     systemUser: SystemUser,
+    page: number,
   ): Promise<Record[]> {
-    return this.recordRepository.getRecords(getRecordsFilterDto, systemUser);
+    return this.recordRepository.getRecords(
+      getRecordsFilterDto,
+      systemUser,
+      page,
+    );
   }
 
   async createRecord(

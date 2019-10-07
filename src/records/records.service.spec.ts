@@ -61,10 +61,12 @@ describe('RecordsService', () => {
       const result = await recordsService.getRecords(
         mockRecordsFilterDto,
         mockSystemUser,
+        1,
       );
       expect(recordRepository.getRecords).toHaveBeenCalledWith(
         mockRecordsFilterDto,
         mockSystemUser,
+        1,
       );
       expect(result).toEqual(mockRecord);
     });

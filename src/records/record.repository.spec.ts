@@ -5,6 +5,8 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordType } from './record-type.enum';
 import { Test } from '@nestjs/testing';
 import { RecordRepository } from './record.repository';
+import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
+import { RecordStatus } from './record-status.enum';
 
 describe('RecordRepository', () => {
   let recordRepository;
@@ -60,6 +62,26 @@ describe('RecordRepository', () => {
       );
 
       expect(result).toEqual(mockRecord);
+    });
+  });
+
+  describe('getRecords', () => {
+    it('Successfully returns records with query', async () => {
+      const mockGetRecordsFilterDto = new GetRecordsFilterDto();
+      mockGetRecordsFilterDto.status = RecordStatus.RESOLVED;
+
+      spyOn(recordRepository, 'getRecords').and.returnValue([
+        mockRecord,
+        mockRecord,
+      ]);
+
+      const result = await recordRepository.getRecords(
+        mockGetRecordsFilterDto,
+        mockSystemUser,
+        1,
+      );
+
+      expect(result).toEqual([mockRecord, mockRecord]);
     });
   });
 });
