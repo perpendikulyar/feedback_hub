@@ -116,8 +116,6 @@ export class RecordRepository extends Repository<Record> {
     record.title = title;
     record.description = description;
     record.status = RecordStatus.NEW;
-    record.creationDate = new Date();
-    record.lastUpdateDate = new Date();
     record.type = type;
     record.creator = creator;
     record.systemUser = systemUser;

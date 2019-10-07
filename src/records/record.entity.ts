@@ -4,6 +4,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
@@ -27,10 +29,10 @@ export class Record extends BaseEntity {
   @Column()
   type: RecordType;
 
-  @Column('timestamptz')
+  @CreateDateColumn()
   creationDate: Date;
 
-  @Column('timestamptz')
+  @UpdateDateColumn()
   lastUpdateDate: Date;
 
   @ManyToOne(type => Creator, creator => creator.records, { eager: false })
