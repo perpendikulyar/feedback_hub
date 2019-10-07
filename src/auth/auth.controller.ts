@@ -19,6 +19,9 @@ export class AuthController {
 
   constructor(private authService: AuthService) {}
 
+  /* Comment this guard on first run to create Super Admin */
+
+  @UseGuards(AuthGuard())
   @Post('/createSystemUser')
   createSystemUser(
     @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,

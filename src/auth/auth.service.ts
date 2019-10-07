@@ -32,7 +32,6 @@ export class AuthService {
       process.env.NODE_ENV === 'production' &&
       (await this.systemUserRepository.count()) > 0
     ) {
-      this.logger.log(systemUser);
       if (systemUser && systemUser.role === SystemUserRole.SUPER_ADMIN) {
         this.logger.verbose(
           `User ${systemUser.username} trying to create new user`,
