@@ -1,0 +1,15 @@
+version: '3.1'
+services:
+  PostgreSQL:
+    container_name: PostgreTestClock
+    image: postgres:12-alpine
+    ports:
+      - '5432:5432'
+    enviroment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=toor
+      - POSTGRES_DB=frmfeedback
+      TZ: 'Europe/Moscow'
+      PGTZ: 'Europe/Moscow'
+    volumes:
+      -./docker-volumes/postgresql:/var/lib/postgresql
