@@ -27,11 +27,8 @@ export class AuthService {
     createSystemUserDto: CreateSystemUserDto,
     systemUser: SystemUser,
   ): Promise<void> {
-    /* this statement could be deleted after app succsessfully running some time */
-    if (
-      process.env.NODE_ENV === 'production' &&
-      (await this.systemUserRepository.count()) > 0
-    ) {
+    /* this statement shuold be deleted after app succsessfully running some time */
+    if (process.env.NODE_ENV !== 'firstRun') {
       if (systemUser && systemUser.role === SystemUserRole.SUPER_ADMIN) {
         this.logger.verbose(
           `User ${systemUser.username} trying to create new user`,

@@ -28,17 +28,11 @@ export class RecordRepository extends Repository<Record> {
       page,
     } = getRecordsFilterDto;
 
-    const recordsPerPage = 10;
-
     const query = this.createQueryBuilder('record');
 
     query.where('record.systemUserId = :systemUserId', {
       systemUserId: systemUser.id,
     });
-
-    query.take((page ? page : 1) * recordsPerPage);
-
-    query.skip((page ? page : 1) * recordsPerPage - recordsPerPage);
 
     if (status) {
       query.andWhere('record.status = :status', { status });
@@ -98,6 +92,12 @@ export class RecordRepository extends Repository<Record> {
         },
       );
     }
+
+    const recordsPerPage = 10;
+
+    query.take((page ? page : 1) * recordsPerPage);
+
+    query.skip((page ? page : 1) * recordsPerPage - recordsPerPage);
 
     try {
       const records: Record[] = await query

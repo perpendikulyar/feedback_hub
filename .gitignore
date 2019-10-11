@@ -3,7 +3,6 @@
 /node_modules
 
 #app_config
-/config
 docker-compose.production.yml
 
 # Logs

@@ -5,4 +5,4 @@ COPY . .
 RUN npm install
 
 EXPOSE 3000
-CMD ["NPM", "RUN", "start:prod"]
+CMD ["npm", "run", "start:prod"]

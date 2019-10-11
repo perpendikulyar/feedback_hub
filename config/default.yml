@@ -1,0 +1,17 @@
+server:
+  port: 3000
+  timezone: 'Europe/Moscow'
+
+db:
+  type: 'postgres'
+  port: '5432'
+  database: 'frmfeedback'
+  host: 'localhost'
+  username: 'postgres'
+  password: 'postgres'
+  sync: true
+  timezone: 'Europe/Moscow'
+
+jwt:
+  expiresIn: 3600
+  secret: 'secretWord'
