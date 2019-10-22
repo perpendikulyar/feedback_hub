@@ -1,15 +1,16 @@
-version: '3.1'
+version: '2'
 services:
   PostgreSQL:
     container_name: PostgresFrmFeedback
-    image: postgres:11-alpine
+    image: postgres:11
+    restart: always
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
+    network_mode: 'host'
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=toor
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=frmfeedback
-      TZ: 'Europe/Moscow'
-      PGTZ: 'Europe/Moscow'
+      - TZ=Europe/Moscow
     volumes:
-      -./docker-volumes/postgresql:/var/lib/postgresql
+      - ./docker-volumes/postgresql:/var/lib/postgresql
