@@ -8,6 +8,7 @@ import { SystemUser } from './system-user.entity';
 import * as bcrypt from 'bcryptjs';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
+import { SystemUserStatus } from './system-user-status.enum';
 
 const mockCredentialsDto = {
   username: 'TestUsername',
@@ -73,6 +74,7 @@ describe('SystemUserRepository', () => {
 
     it('returns the username as validation is successful', async () => {
       systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.ACTIVE;
       systemUser.validatePassword.mockResolvedValue(true);
 
       const result = await systemUserRepository.validatePassword(
@@ -92,11 +94,22 @@ describe('SystemUserRepository', () => {
 
     it('Returns Null as password is invalid', async () => {
       systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.ACTIVE;
       systemUser.validatePassword.mockResolvedValue(false);
       const result = await systemUserRepository.validatePassword(
         mockCredentialsDto,
       );
       expect(systemUser.validatePassword).toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('Returns Null as user staus is inactive', async () => {
+      systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.INACTIVE;
+      const result = await systemUserRepository.validatePassword(
+        mockCredentialsDto,
+      );
+      expect(systemUser.validatePassword).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
   });

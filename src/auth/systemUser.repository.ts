@@ -8,6 +8,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { SystemUserStatus } from './system-user-status.enum';
 
 @EntityRepository(SystemUser)
 export class SystemUserRepository extends Repository<SystemUser> {
@@ -50,7 +51,11 @@ export class SystemUserRepository extends Repository<SystemUser> {
     const { username, password } = authCredentialsDto;
     const systemUser = await this.findOne({ username });
 
-    if (systemUser && (await systemUser.validatePassword(password))) {
+    if (
+      systemUser &&
+      systemUser.status === SystemUserStatus.ACTIVE &&
+      (await systemUser.validatePassword(password))
+    ) {
       this.logger.verbose(`Successfuly sign in`);
       return systemUser.username;
     } else {
