@@ -27,14 +27,20 @@ export class AuthService {
     createSystemUserDto: CreateSystemUserDto,
     systemUser: SystemUser,
   ): Promise<void> {
-    if (systemUser && systemUser.role === SystemUserRole.SUPER_ADMIN) {
-      this.logger.verbose(
-        `User ${systemUser.username} trying to create new user`,
-      );
-      return this.systemUserRepository.createSystemUser(createSystemUserDto);
+    if (process.env.NODE_ENV === 'production') {
+      if (systemUser && systemUser.role === SystemUserRole.SUPER_ADMIN) {
+        this.logger.verbose(
+          `User ${systemUser.username} trying to create new user`,
+        );
+        return this.systemUserRepository.createSystemUser(createSystemUserDto);
+      } else {
+        this.logger.verbose(
+          `Someone trying to reach creating new user service`,
+        );
+        throw new NotFoundException();
+      }
     } else {
-      this.logger.verbose(`Someone trying to reach creating new user service`);
-      throw new NotFoundException();
+      return this.systemUserRepository.createSystemUser(createSystemUserDto);
     }
   }
 

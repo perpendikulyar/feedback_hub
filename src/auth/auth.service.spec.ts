@@ -74,22 +74,6 @@ describe('Auth Service', () => {
       expect(result).toBe(undefined);
     });
 
-    it('Should call systemUserRepository.createSystemUser and create one without authorisation', async () => {
-      systemUserRepository.count.mockResolvedValue(0);
-
-      const mockSystemUser = null;
-
-      const result = await authService.createSystemUser(
-        mockCreateSystemUserDto,
-        mockSystemUser,
-      );
-
-      expect(systemUserRepository.createSystemUser).toHaveBeenCalledWith(
-        mockCreateSystemUserDto,
-      );
-      expect(result).toBe(undefined);
-    });
-
     it('Should return NotFoundException when systemUser is not super_admin', async () => {
       systemUserRepository.count.mockResolvedValue(32);
 

@@ -1,16 +1,28 @@
-version: '2'
+version: '3'
 services:
   PostgreSQL:
     container_name: PostgresFrmFeedback
-    image: postgres:11
+    image: postgres:11-alpine
+    hostname: localhost
     restart: always
+    expose:
+      - '5432'
     ports:
-      - '127.0.0.1:5432:5432'
-    network_mode: 'host'
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=frmfeedback
       - TZ=Europe/Moscow
     volumes:
-      - ./docker-volumes/postgresql:/var/lib/postgresql
+      - ./docker-volumes/postgresql:/var/lib/postgres/feedback_data
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - PostgreSQL
+    ports:
+      - 5454:5454/tcp
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+      - PGADMIN_LISTEN_PORT=5454

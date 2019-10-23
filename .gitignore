@@ -1,9 +1,8 @@
 # compiled output
 /dist
 /node_modules
+/docker-volumes
 
-#app_config
-docker-compose.production.yml
 
 # Logs
 logs
