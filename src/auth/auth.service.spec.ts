@@ -2,10 +2,16 @@ import { AuthService } from './auth.service';
 import { SystemUserRepository } from './systemUser.repository';
 import { Test } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
 import { SystemUser } from './system-user.entity';
+import { UpdateSystemUserDto } from './dto/update-system-user.dto';
+import { SystemUserStatus } from './system-user-status.enum';
 
 describe('Auth Service', () => {
   let authService: AuthService;
@@ -17,6 +23,7 @@ describe('Auth Service', () => {
     createSystemUser: jest.fn(),
     update: jest.fn(),
     count: jest.fn(),
+    findOne: jest.fn(),
   });
 
   const mockCredentialsDto = {
@@ -106,6 +113,65 @@ describe('Auth Service', () => {
       expect(authService.signIn(mockCredentialsDto)).rejects.toThrow(
         UnauthorizedException,
       );
+    });
+  });
+
+  describe('updateSystemUser', () => {
+    const updateSystemUserDto = new UpdateSystemUserDto();
+    updateSystemUserDto.status = SystemUserStatus.INACTIVE;
+    updateSystemUserDto.role = SystemUserRole.API_USER;
+
+    const mockSystemUser = new SystemUser();
+    mockSystemUser.username = 'test username';
+    mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
+
+    it('Should successfully update systemUser', async () => {
+      systemUserRepository.findOne.mockResolvedValue(mockSystemUser);
+
+      const result = await authService.updateSystemUser(
+        24,
+        updateSystemUserDto,
+        mockSystemUser,
+      );
+
+      expect(systemUserRepository.findOne).toHaveBeenCalledWith({ id: 24 });
+      expect(result).toEqual(mockSystemUser);
+    });
+
+    it('Should return NotFound if it no a superadmin request', async () => {
+      mockSystemUser.role = SystemUserRole.API_USER;
+
+      expect(
+        authService.updateSystemUser(24, updateSystemUserDto, mockSystemUser),
+      ).rejects.toThrow(NotFoundException);
+      expect(systemUserRepository.findOne).not.toHaveBeenCalled();
+    });
+
+    it('Should return BadRequest with empty DTO', async () => {
+      const emptyUpdateSystemUserDto = new UpdateSystemUserDto();
+
+      expect(
+        authService.updateSystemUser(
+          24,
+          emptyUpdateSystemUserDto,
+          mockSystemUser,
+        ),
+      ).rejects.toThrow(BadRequestException);
+      expect(systemUserRepository.findOne).not.toHaveBeenCalled();
+    });
+
+    it('Should return NotFound when system user does not exist', async () => {
+      systemUserRepository.findOne.mockResolvedValue(null);
+
+      const result = authService.updateSystemUser(
+        24,
+        updateSystemUserDto,
+        mockSystemUser,
+      );
+
+      expect(systemUserRepository.findOne).toHaveBeenCalledWith({ id: 24 });
+
+      expect(result).rejects.toThrow(NotFoundException);
     });
   });
 });

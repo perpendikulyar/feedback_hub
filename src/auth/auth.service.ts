@@ -12,6 +12,11 @@ import { JwtPayload } from './jwt-payload.interface';
 import { SystemUser } from './system-user.entity';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
+import { UpdateSystemUserDto } from './dto/update-system-user.dto';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -68,5 +73,58 @@ export class AuthService {
       `Generated JWT token with payload "${JSON.stringify(payload)}"`,
     );
     return { accessToken };
+  }
+
+  async updateSystemUser(
+    id: number,
+    updateSystemUserDto: UpdateSystemUserDto,
+    systemUser: SystemUser,
+  ): Promise<SystemUser> {
+    const { role, status } = updateSystemUserDto;
+
+    if (!status && !role) {
+      this.logger.verbose('No properties to updete are declareted');
+      throw new BadRequestException('No properties to updete are declareted');
+    }
+
+    if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
+      this.logger.verbose(
+        `User ${systemUser.username} trying to update SustemUser with ID ${id}`,
+      );
+      throw new NotFoundException();
+    }
+
+    const updation: SystemUser = await this.systemUserRepository.findOne({
+      id,
+    });
+
+    if (!updation) {
+      throw new NotFoundException(`SystemUser with ID ${id} not found`);
+    }
+
+    if (status) {
+      updation.status = status;
+    }
+    if (role) {
+      updation.role = role;
+    }
+
+    try {
+      await updation.save();
+      this.logger.verbose(
+        `SystemUser with ID ${id} successfully updated with new data: ${JSON.stringify(
+          updateSystemUserDto,
+        )} by ${systemUser.username}`,
+      );
+      return updation;
+    } catch (error) {
+      this.logger.error(
+        `Failed on update SystemUser with ID ${id} with new data: ${JSON.stringify(
+          updateSystemUserDto,
+        )}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
   }
 }
