@@ -47,6 +47,7 @@ export class AuthController {
   createSuperAdmin() {
     if (process.env.NODE_ENV !== 'production') {
       const superAdminDTO: CreateSystemUserDto = {
+        email: 'test@example.ru',
         username: 'superAdmin',
         password: 'SuperSecret',
         role: SystemUserRole.SUPER_ADMIN,

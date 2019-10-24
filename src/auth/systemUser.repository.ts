@@ -17,9 +17,10 @@ export class SystemUserRepository extends Repository<SystemUser> {
   async createSystemUser(
     createSystemUserDto: CreateSystemUserDto,
   ): Promise<void> {
-    const { username, password, role } = createSystemUserDto;
+    const { email, username, password, role } = createSystemUserDto;
 
     const systemUser = this.create();
+    systemUser.email = email;
     systemUser.username = username;
     systemUser.salt = await bcrypt.genSalt();
     systemUser.password = await this.hashPassword(password, systemUser.salt);
@@ -31,8 +32,8 @@ export class SystemUserRepository extends Repository<SystemUser> {
       this.logger.verbose('User successfuly created');
     } catch (error) {
       if (error.code === '23505') {
-        this.logger.verbose('Username already exist');
-        throw new ConflictException('Username already exist');
+        this.logger.verbose('Email already exist');
+        throw new ConflictException('Email already exist');
       } else {
         this.logger.error(
           `Failed on creatin new user with credentials: ${JSON.stringify(
@@ -48,8 +49,8 @@ export class SystemUserRepository extends Repository<SystemUser> {
   async validatePassword(
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<string> {
-    const { username, password } = authCredentialsDto;
-    const systemUser = await this.findOne({ username });
+    const { email, password } = authCredentialsDto;
+    const systemUser = await this.findOne({ email });
 
     if (
       systemUser &&
@@ -57,7 +58,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
       (await systemUser.validatePassword(password))
     ) {
       this.logger.verbose(`Successfuly sign in`);
-      return systemUser.username;
+      return systemUser.email;
     } else {
       return null;
     }

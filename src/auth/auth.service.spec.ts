@@ -20,7 +20,7 @@ describe('Auth Service', () => {
   });
 
   const mockCredentialsDto = {
-    username: 'TestUsername',
+    email: 'test@example.ru',
     password: 'TestPassword',
   };
 
@@ -51,6 +51,7 @@ describe('Auth Service', () => {
     process.env.NODE_ENV = 'production';
 
     const mockCreateSystemUserDto = new CreateSystemUserDto();
+    mockCreateSystemUserDto.email = 'test@example.ru';
     mockCreateSystemUserDto.username = 'TestUser';
     mockCreateSystemUserDto.password = 'Password';
     mockCreateSystemUserDto.role = SystemUserRole.API_USER;
@@ -89,9 +90,9 @@ describe('Auth Service', () => {
 
   describe('signIn', () => {
     it('Should calls systemUserRepository.validatePassword and generate accessToken', async () => {
-      const mockUsername = 'TestUsername';
+      const mockEmail = 'test@example.ru';
       const mockAccessToken = 'testAccessToken';
-      systemUserRepository.validatePassword.mockResolvedValue(mockUsername);
+      systemUserRepository.validatePassword.mockResolvedValue(mockEmail);
       spyOn(jwtService, 'sign').and.returnValue(mockAccessToken);
 
       const result = await authService.signIn(mockCredentialsDto);

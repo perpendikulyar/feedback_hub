@@ -5,10 +5,14 @@ import {
   Matches,
   IsNotEmpty,
   IsIn,
+  IsEmail,
 } from 'class-validator';
 import { SystemUserRole } from '../system-user-role.enum';
 
 export class CreateSystemUserDto {
+  @IsEmail()
+  email: string;
+
   @IsString()
   @MinLength(6)
   @MaxLength(24)

@@ -11,11 +11,12 @@ import { SystemUserRole } from './system-user-role.enum';
 import { SystemUserStatus } from './system-user-status.enum';
 
 const mockCredentialsDto = {
-  username: 'TestUsername',
+  emaol: 'test@example.ru',
   password: 'TestPassword',
 };
 
 const mockCreateSystemUserDto = new CreateSystemUserDto();
+mockCreateSystemUserDto.email = 'test@example.ru';
 mockCreateSystemUserDto.username = 'TestUser';
 mockCreateSystemUserDto.password = 'Password';
 mockCreateSystemUserDto.role = SystemUserRole.API_USER;
@@ -68,7 +69,7 @@ describe('SystemUserRepository', () => {
     beforeEach(() => {
       systemUserRepository.findOne = jest.fn();
       systemUser = new SystemUser();
-      systemUser.username = 'TestUsername';
+      systemUser.email = 'test@example.ru';
       systemUser.validatePassword = jest.fn();
     });
 
@@ -80,7 +81,7 @@ describe('SystemUserRepository', () => {
       const result = await systemUserRepository.validatePassword(
         mockCredentialsDto,
       );
-      expect(result).toEqual('TestUsername');
+      expect(result).toEqual('test@example.ru');
     });
 
     it('Returns Null as user cannot be found', async () => {

@@ -20,6 +20,9 @@ export class SystemUser extends BaseEntity {
   id: number;
 
   @Column()
+  email: string;
+
+  @Column()
   username: string;
 
   @Column()
