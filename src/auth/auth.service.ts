@@ -94,29 +94,29 @@ export class AuthService {
       throw new NotFoundException();
     }
 
-    const updation: SystemUser = await this.systemUserRepository.findOne({
+    const updatable: SystemUser = await this.systemUserRepository.findOne({
       id,
     });
 
-    if (!updation) {
+    if (!updatable) {
       throw new NotFoundException(`SystemUser with ID ${id} not found`);
     }
 
     if (status) {
-      updation.status = status;
+      updatable.status = status;
     }
     if (role) {
-      updation.role = role;
+      updatable.role = role;
     }
 
     try {
-      await updation.save();
+      await updatable.save();
       this.logger.verbose(
         `SystemUser with ID ${id} successfully updated with new data: ${JSON.stringify(
           updateSystemUserDto,
         )} by ${systemUser.username}`,
       );
-      return updation;
+      return updatable;
     } catch (error) {
       this.logger.error(
         `Failed on update SystemUser with ID ${id} with new data: ${JSON.stringify(

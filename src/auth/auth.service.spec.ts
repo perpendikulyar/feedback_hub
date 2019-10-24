@@ -122,11 +122,18 @@ describe('Auth Service', () => {
     updateSystemUserDto.role = SystemUserRole.API_USER;
 
     const mockSystemUser = new SystemUser();
-    mockSystemUser.username = 'test username';
-    mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
+    beforeEach(() => {
+      mockSystemUser.username = 'test username';
+      mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
+    });
 
     it('Should successfully update systemUser', async () => {
-      systemUserRepository.findOne.mockResolvedValue(mockSystemUser);
+      const updatable = new SystemUser();
+      updatable.id = 24;
+      updatable.username = 'test updatable username';
+      updatable.save = jest.fn();
+
+      systemUserRepository.findOne.mockResolvedValue(updatable);
 
       const result = await authService.updateSystemUser(
         24,
@@ -135,7 +142,8 @@ describe('Auth Service', () => {
       );
 
       expect(systemUserRepository.findOne).toHaveBeenCalledWith({ id: 24 });
-      expect(result).toEqual(mockSystemUser);
+      expect(updatable.save).toHaveBeenCalled();
+      expect(result).toEqual(updatable);
     });
 
     it('Should return NotFound if it no a superadmin request', async () => {
@@ -168,9 +176,7 @@ describe('Auth Service', () => {
         updateSystemUserDto,
         mockSystemUser,
       );
-
       expect(systemUserRepository.findOne).toHaveBeenCalledWith({ id: 24 });
-
       expect(result).rejects.toThrow(NotFoundException);
     });
   });
