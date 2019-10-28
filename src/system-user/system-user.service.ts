@@ -16,6 +16,7 @@ import { JwtPayload } from './jwt-payload.interface';
 import { SystemUserRole } from './system-user-role.enum';
 import { SystemUser } from './system-user.entity';
 import { SystemUserRepository } from './system-user.repository';
+import { SystemUserStatus } from './system-user-status.enum';
 
 @Injectable()
 export class SystemUserService {
