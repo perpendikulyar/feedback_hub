@@ -20,11 +20,11 @@ export class SystemUser extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
+  @Index({ unique: true })
   @Column()
   email: string;
 
-  @Index({ unique: true })
+  @Index()
   @Column()
   username: string;
 
