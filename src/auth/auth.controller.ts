@@ -26,7 +26,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(AuthGuard())
-  @Post('/createSystemUser')
+  @Post('/systemUser')
   createSystemUser(
     @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,
     @GetSystemUser() systemUser: SystemUser,
@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard())
-  @Patch('/updateSystemUser/:id')
+  @Patch('/systemUser/:id')
   updateSystemUser(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateSystemUserDto: UpdateSystemUserDto,
@@ -61,7 +61,7 @@ export class AuthController {
     );
   }
 
-  @Post('/createSuperAdmin/')
+  @Post('/systemUser/createSuperAdmin')
   createSuperAdmin() {
     if (process.env.NODE_ENV !== 'production') {
       const superAdminDTO: CreateSystemUserDto = {
