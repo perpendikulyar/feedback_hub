@@ -12,6 +12,11 @@ import { JwtPayload } from './jwt-payload.interface';
 import { SystemUser } from './system-user.entity';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
+import { UpdateSystemUserDto } from './dto/update-system-user.dto';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -47,20 +52,20 @@ export class AuthService {
   async signIn(
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
-    const username = await this.systemUserRepository.validatePassword(
+    const email = await this.systemUserRepository.validatePassword(
       authCredentialsDto,
     );
 
-    if (!username) {
+    if (!email) {
       this.logger.verbose('Invalid credentials');
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload: JwtPayload = { username };
+    const payload: JwtPayload = { email };
     const accessToken = this.jwtService.sign(payload);
 
     await this.systemUserRepository.update(
-      { username },
+      { email },
       { lastAuthDate: new Date() },
     );
 
@@ -68,5 +73,58 @@ export class AuthService {
       `Generated JWT token with payload "${JSON.stringify(payload)}"`,
     );
     return { accessToken };
+  }
+
+  async updateSystemUser(
+    id: number,
+    updateSystemUserDto: UpdateSystemUserDto,
+    systemUser: SystemUser,
+  ): Promise<SystemUser> {
+    const { role, status } = updateSystemUserDto;
+
+    if (!status && !role) {
+      this.logger.verbose('No properties to updete are declareted');
+      throw new BadRequestException('No properties to updete are declareted');
+    }
+
+    if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
+      this.logger.verbose(
+        `User ${systemUser.username} trying to update SustemUser with ID ${id}`,
+      );
+      throw new NotFoundException();
+    }
+
+    const updatable: SystemUser = await this.systemUserRepository.findOne({
+      id,
+    });
+
+    if (!updatable) {
+      throw new NotFoundException(`SystemUser with ID ${id} not found`);
+    }
+
+    if (status) {
+      updatable.status = status;
+    }
+    if (role) {
+      updatable.role = role;
+    }
+
+    try {
+      await updatable.save();
+      this.logger.verbose(
+        `SystemUser with ID ${id} successfully updated with new data: ${JSON.stringify(
+          updateSystemUserDto,
+        )} by ${systemUser.username}`,
+      );
+      return updatable;
+    } catch (error) {
+      this.logger.error(
+        `Failed on update SystemUser with ID ${id} with new data: ${JSON.stringify(
+          updateSystemUserDto,
+        )}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
   }
 }

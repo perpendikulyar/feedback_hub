@@ -29,21 +29,21 @@ describe('JwtStrategy', () => {
   describe('validate', () => {
     it('validates and returns the user based on JWT payload', async () => {
       const systemUser = new SystemUser();
-      systemUser.username = 'TestUser';
+      systemUser.email = 'test@example.ru';
 
       systemUserRepository.findOne.mockResolvedValue(systemUser);
-      const result = await jwtStrategy.validate({ username: 'TestUser' });
+      const result = await jwtStrategy.validate({ email: 'test@example.ru' });
       expect(systemUserRepository.findOne).toHaveBeenCalledWith({
-        username: 'TestUser',
+        email: 'test@example.ru',
       });
       expect(result).toEqual(systemUser);
     });
 
     it('throws an unauthorized exception as user cannot be found', () => {
       systemUserRepository.findOne.mockResolvedValue(null);
-      expect(jwtStrategy.validate({ username: 'TestUser' })).rejects.toThrow(
-        UnauthorizedException,
-      );
+      expect(
+        jwtStrategy.validate({ email: 'test@example.ru' }),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

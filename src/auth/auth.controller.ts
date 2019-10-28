@@ -4,7 +4,10 @@ import {
   Body,
   ValidationPipe,
   Logger,
+  Patch,
   UseGuards,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -14,6 +17,7 @@ import { GetSystemUser } from './get-system-user.decorator';
 import { SystemUser } from './system-user.entity';
 import { SystemUserRole } from './system-user-role.enum';
 import { NotFoundException } from '@nestjs/common';
+import { UpdateSystemUserDto } from './dto/update-system-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +26,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(AuthGuard())
-  @Post('/createSystemUser')
+  @Post('/systemUser')
   createSystemUser(
     @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,
     @GetSystemUser() systemUser: SystemUser,
@@ -43,10 +47,25 @@ export class AuthController {
     return this.authService.signIn(authCredentialsDto);
   }
 
-  @Post('/createSuperAdmin')
+  @UseGuards(AuthGuard())
+  @Patch('/systemUser/:id')
+  updateSystemUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) updateSystemUserDto: UpdateSystemUserDto,
+    @GetSystemUser() systemUser: SystemUser,
+  ): Promise<SystemUser> {
+    return this.authService.updateSystemUser(
+      id,
+      updateSystemUserDto,
+      systemUser,
+    );
+  }
+
+  @Post('/systemUser/createSuperAdmin')
   createSuperAdmin() {
     if (process.env.NODE_ENV !== 'production') {
       const superAdminDTO: CreateSystemUserDto = {
+        email: 'test@example.ru',
         username: 'superAdmin',
         password: 'SuperSecret',
         role: SystemUserRole.SUPER_ADMIN,

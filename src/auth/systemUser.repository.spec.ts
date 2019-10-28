@@ -8,13 +8,15 @@ import { SystemUser } from './system-user.entity';
 import * as bcrypt from 'bcryptjs';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
+import { SystemUserStatus } from './system-user-status.enum';
 
 const mockCredentialsDto = {
-  username: 'TestUsername',
+  emaol: 'test@example.ru',
   password: 'TestPassword',
 };
 
 const mockCreateSystemUserDto = new CreateSystemUserDto();
+mockCreateSystemUserDto.email = 'test@example.ru';
 mockCreateSystemUserDto.username = 'TestUser';
 mockCreateSystemUserDto.password = 'Password';
 mockCreateSystemUserDto.role = SystemUserRole.API_USER;
@@ -67,18 +69,19 @@ describe('SystemUserRepository', () => {
     beforeEach(() => {
       systemUserRepository.findOne = jest.fn();
       systemUser = new SystemUser();
-      systemUser.username = 'TestUsername';
+      systemUser.email = 'test@example.ru';
       systemUser.validatePassword = jest.fn();
     });
 
     it('returns the username as validation is successful', async () => {
       systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.ACTIVE;
       systemUser.validatePassword.mockResolvedValue(true);
 
       const result = await systemUserRepository.validatePassword(
         mockCredentialsDto,
       );
-      expect(result).toEqual('TestUsername');
+      expect(result).toEqual('test@example.ru');
     });
 
     it('Returns Null as user cannot be found', async () => {
@@ -92,11 +95,22 @@ describe('SystemUserRepository', () => {
 
     it('Returns Null as password is invalid', async () => {
       systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.ACTIVE;
       systemUser.validatePassword.mockResolvedValue(false);
       const result = await systemUserRepository.validatePassword(
         mockCredentialsDto,
       );
       expect(systemUser.validatePassword).toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('Returns Null as user staus is inactive', async () => {
+      systemUserRepository.findOne.mockResolvedValue(systemUser);
+      systemUser.status = SystemUserStatus.INACTIVE;
+      const result = await systemUserRepository.validatePassword(
+        mockCredentialsDto,
+      );
+      expect(systemUser.validatePassword).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
   });

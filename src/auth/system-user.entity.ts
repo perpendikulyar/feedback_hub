@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import { Record } from '../records/record.entity';
 import { Creator } from '../creators/creator.entity';
 import { SystemUserRole } from './system-user-role.enum';
+import { SystemUserStatus } from './system-user-status.enum';
 import {
   Entity,
   Unique,
@@ -17,6 +18,9 @@ import {
 export class SystemUser extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  email: string;
 
   @Column()
   username: string;
@@ -39,6 +43,13 @@ export class SystemUser extends BaseEntity {
     default: SystemUserRole.API_USER,
   })
   role: SystemUserRole;
+
+  @Column({
+    type: 'enum',
+    enum: SystemUserStatus,
+    default: SystemUserStatus.ACTIVE,
+  })
+  status: SystemUserStatus;
 
   @OneToMany(type => Record, record => record.systemUser, { eager: true })
   records: Record[];
