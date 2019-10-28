@@ -5,6 +5,7 @@ import {
   Column,
   OneToMany,
   ManyToOne,
+  Index,
 } from 'typeorm';
 import { Record } from '../records/record.entity';
 import { SystemUser } from '../auth/system-user.entity';
@@ -14,6 +15,7 @@ export class Creator extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column()
   creatorHash: string;
 
