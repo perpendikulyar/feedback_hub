@@ -11,17 +11,20 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
-@Unique(['username'])
+@Unique(['email'])
 export class SystemUser extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index({ unique: true })
   @Column()
   email: string;
 
+  @Index()
   @Column()
   username: string;
 
@@ -37,6 +40,7 @@ export class SystemUser extends BaseEntity {
   @Column()
   lastAuthDate: Date;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: SystemUserRole,
@@ -44,6 +48,7 @@ export class SystemUser extends BaseEntity {
   })
   role: SystemUserRole;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: SystemUserStatus,
@@ -54,11 +59,11 @@ export class SystemUser extends BaseEntity {
   @OneToMany(type => Record, record => record.systemUser, { eager: true })
   records: Record[];
 
+  @OneToMany(type => Creator, creator => creator.systemUser, { eager: true })
+  creators: Creator[];
+
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
   }
-
-  @OneToMany(type => Creator, creator => creator.systemUser, { eager: true })
-  creators: Creator[];
 }

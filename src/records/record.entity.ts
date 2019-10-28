@@ -6,6 +6,8 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
+  In,
 } from 'typeorm';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
@@ -13,6 +15,7 @@ import { RecordType } from './record-type.enum';
 import { SystemUser } from '../auth/system-user.entity';
 
 @Entity()
+@Index(['title', 'description'])
 export class Record extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -23,6 +26,7 @@ export class Record extends BaseEntity {
   @Column()
   description: string;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: RecordStatus,
@@ -30,6 +34,7 @@ export class Record extends BaseEntity {
   })
   status: RecordStatus;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: RecordType,
@@ -54,6 +59,7 @@ export class Record extends BaseEntity {
   })
   systemUser: SystemUser;
 
+  @Index()
   @Column()
   systemUserId: number;
 

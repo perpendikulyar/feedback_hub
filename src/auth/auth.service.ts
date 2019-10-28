@@ -116,6 +116,8 @@ export class AuthService {
           updateSystemUserDto,
         )} by ${systemUser.username}`,
       );
+      delete updatable.records;
+      delete updatable.creators;
       return updatable;
     } catch (error) {
       this.logger.error(
