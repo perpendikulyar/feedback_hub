@@ -1,27 +1,25 @@
 import {
+  BadRequestException,
   Injectable,
-  UnauthorizedException,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { SystemUserRepository } from './system-user.repository';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { JwtPayload } from './jwt-payload.interface';
-import { SystemUser } from './system-user.entity';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
-import { SystemUserRole } from './system-user-role.enum';
-import { UpdateSystemUserDto } from './dto/update-system-user.dto';
-import {
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
 import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
+import { UpdateSystemUserDto } from './dto/update-system-user.dto';
+import { JwtPayload } from './jwt-payload.interface';
+import { SystemUserRole } from './system-user-role.enum';
+import { SystemUser } from './system-user.entity';
+import { SystemUserRepository } from './system-user.repository';
 
 @Injectable()
-export class AuthService {
-  private readonly logger = new Logger('AuthService');
+export class SystemUserService {
+  private readonly logger = new Logger('SystemUserService');
 
   constructor(
     @InjectRepository(SystemUserRepository)

@@ -1,4 +1,4 @@
-import { AuthService } from './system-user.service';
+import { SystemUserService } from './system-user.service';
 import { SystemUserRepository } from './system-user.repository';
 import { Test } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -14,7 +14,7 @@ import { UpdateSystemUserDto } from './dto/update-system-user.dto';
 import { SystemUserStatus } from './system-user-status.enum';
 
 describe('Auth Service', () => {
-  let authService: AuthService;
+  let sytemUserService: SystemUserService;
   let jwtService: JwtService;
   let systemUserRepository;
 
@@ -42,19 +42,19 @@ describe('Auth Service', () => {
         }),
       ],
       providers: [
-        AuthService,
+        SystemUserService,
         { provide: SystemUserRepository, useFactory: mockSystemUserRepository },
       ],
     }).compile();
 
-    authService = await module.get<AuthService>(AuthService);
+    sytemUserService = await module.get<SystemUserService>(SystemUserService);
     jwtService = await module.get<JwtService>(JwtService);
     systemUserRepository = await module.get<SystemUserRepository>(
       SystemUserRepository,
     );
   });
 
-  describe('createSystemUSer', () => {
+  describe('createSystemUser', () => {
     process.env.NODE_ENV = 'production';
 
     const mockCreateSystemUserDto = new CreateSystemUserDto();
@@ -72,7 +72,7 @@ describe('Auth Service', () => {
 
       systemUserRepository.createSystemUser.mockResolvedValue(undefined);
 
-      const result = await authService.createSystemUser(
+      const result = await sytemUserService.createSystemUser(
         mockCreateSystemUserDto,
         mockSystemUser,
       );
@@ -90,7 +90,10 @@ describe('Auth Service', () => {
       mockSystemUser.role = SystemUserRole.API_USER;
 
       expect(
-        authService.createSystemUser(mockCreateSystemUserDto, mockSystemUser),
+        sytemUserService.createSystemUser(
+          mockCreateSystemUserDto,
+          mockSystemUser,
+        ),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -102,7 +105,7 @@ describe('Auth Service', () => {
       systemUserRepository.validatePassword.mockResolvedValue(mockEmail);
       spyOn(jwtService, 'sign').and.returnValue(mockAccessToken);
 
-      const result = await authService.signIn(mockCredentialsDto);
+      const result = await sytemUserService.signIn(mockCredentialsDto);
       expect(systemUserRepository.update).toHaveBeenCalled();
       expect(result).toEqual({ accessToken: mockAccessToken });
     });
@@ -110,7 +113,7 @@ describe('Auth Service', () => {
     it('Should calls systemUserRepository.validatePassword then returns null and thow an Unauthorized error', async () => {
       systemUserRepository.validatePassword.mockResolvedValue(null);
 
-      expect(authService.signIn(mockCredentialsDto)).rejects.toThrow(
+      expect(sytemUserService.signIn(mockCredentialsDto)).rejects.toThrow(
         UnauthorizedException,
       );
     });
@@ -135,7 +138,7 @@ describe('Auth Service', () => {
 
       systemUserRepository.findOne.mockResolvedValue(updatable);
 
-      const result = await authService.updateSystemUser(
+      const result = await sytemUserService.updateSystemUser(
         24,
         updateSystemUserDto,
         mockSystemUser,
@@ -150,7 +153,11 @@ describe('Auth Service', () => {
       mockSystemUser.role = SystemUserRole.API_USER;
 
       expect(
-        authService.updateSystemUser(24, updateSystemUserDto, mockSystemUser),
+        sytemUserService.updateSystemUser(
+          24,
+          updateSystemUserDto,
+          mockSystemUser,
+        ),
       ).rejects.toThrow(NotFoundException);
       expect(systemUserRepository.findOne).not.toHaveBeenCalled();
     });
@@ -159,7 +166,7 @@ describe('Auth Service', () => {
       const emptyUpdateSystemUserDto = new UpdateSystemUserDto();
 
       expect(
-        authService.updateSystemUser(
+        sytemUserService.updateSystemUser(
           24,
           emptyUpdateSystemUserDto,
           mockSystemUser,
@@ -171,7 +178,7 @@ describe('Auth Service', () => {
     it('Should return NotFound when system user does not exist', async () => {
       systemUserRepository.findOne.mockResolvedValue(null);
 
-      const result = authService.updateSystemUser(
+      const result = sytemUserService.updateSystemUser(
         24,
         updateSystemUserDto,
         mockSystemUser,
