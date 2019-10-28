@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreatorRepository } from './creator.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Creator } from './creator.entity';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 
 @Injectable()
 export class CreatorsService {

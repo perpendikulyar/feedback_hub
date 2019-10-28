@@ -5,9 +5,9 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
-import { SystemUserRole } from '../auth/system-user-role.enum';
+import { SystemUserRole } from '../system-user/system-user-role.enum';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {

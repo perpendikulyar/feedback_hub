@@ -1,7 +1,7 @@
 import { JwtStrategy } from './jwt.strategy';
-import { SystemUserRepository } from './systemUser.repository';
+import { SystemUserRepository } from './system-user.repository';
 import { Test } from '@nestjs/testing';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from './system-user.entity';
 import { UnauthorizedException } from '@nestjs/common';
 
 const mockSystemUserRepository = () => ({

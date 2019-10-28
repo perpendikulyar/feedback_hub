@@ -1,4 +1,4 @@
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 import { Creator } from '../creators/creator.entity';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';

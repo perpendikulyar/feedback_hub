@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Creator } from './creator.entity';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 
 @EntityRepository(Creator)
 export class CreatorRepository extends Repository<Creator> {

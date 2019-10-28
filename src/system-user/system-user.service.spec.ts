@@ -1,5 +1,5 @@
-import { AuthService } from './auth.service';
-import { SystemUserRepository } from './systemUser.repository';
+import { AuthService } from './system-user.service';
+import { SystemUserRepository } from './system-user.repository';
 import { Test } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import {

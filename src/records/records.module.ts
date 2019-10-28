@@ -6,7 +6,7 @@ import { RecordsService } from './records.service';
 import { CreatorsModule } from '../creators/creators.module';
 import { CreatorsService } from '../creators/creators.service';
 import { CreatorRepository } from '../creators/creator.repository';
-import { AuthModule } from '../auth/auth.module';
+import { AuthModule } from '../system-user/system-user.module';
 
 @Module({
   imports: [

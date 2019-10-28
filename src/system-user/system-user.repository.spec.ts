@@ -1,4 +1,4 @@
-import { SystemUserRepository } from './systemUser.repository';
+import { SystemUserRepository } from './system-user.repository';
 import { Test } from '@nestjs/testing';
 import {
   ConflictException,

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthController } from './system-user.controller';
+import { AuthService } from './system-user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
-import { SystemUserRepository } from './systemUser.repository';
+import { SystemUserRepository } from './system-user.repository';
 
 const jwtConfig = config.get('jwt');
 

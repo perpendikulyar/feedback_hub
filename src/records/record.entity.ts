@@ -10,7 +10,7 @@ import {
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
 import { RecordType } from './record-type.enum';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 
 @Entity()
 export class Record extends BaseEntity {
