@@ -8,8 +8,10 @@ import {
   UseGuards,
   Param,
   ParseIntPipe,
+  Get,
+  Query,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './system-user.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,15 +20,16 @@ import { SystemUser } from './system-user.entity';
 import { SystemUserRole } from './system-user-role.enum';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateSystemUserDto } from './dto/update-system-user.dto';
+import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
 
-@Controller('auth')
+@Controller('systemUsers')
 export class AuthController {
   private readonly logger = new Logger('AuthController');
 
   constructor(private authService: AuthService) {}
 
   @UseGuards(AuthGuard())
-  @Post('/systemUser')
+  @Post()
   createSystemUser(
     @Body(ValidationPipe) createSystemUserDto: CreateSystemUserDto,
     @GetSystemUser() systemUser: SystemUser,
@@ -39,6 +42,36 @@ export class AuthController {
     return this.authService.createSystemUser(createSystemUserDto, systemUser);
   }
 
+  @UseGuards(AuthGuard())
+  @Get()
+  getSystemUsers(
+    @Query(ValidationPipe) getSystemUsersFilterDto: GetSystemUsersFilterDto,
+    @GetSystemUser() systemUser: SystemUser,
+  ): Promise<SystemUser[]> {
+    this.logger.verbose(
+      `SystemUser ${
+        systemUser.username
+      } trying to fetch systemusers with filter ${JSON.stringify(
+        getSystemUsersFilterDto,
+      )}`,
+    );
+    return this.authService.getSystemUsers(getSystemUsersFilterDto, systemUser);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('/:id')
+  getSystemUserById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetSystemUser() systemUser: SystemUser,
+  ): Promise<SystemUser> {
+    this.logger.verbose(
+      `SystemUser ${
+        systemUser.username
+      } trying to fetch systemUsers with ID ${id}`,
+    );
+    return this.authService.getSystemUserById(id, systemUser);
+  }
+
   @Post('/signin')
   signIn(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
@@ -48,12 +81,19 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard())
-  @Patch('/systemUser/:id')
+  @Patch('/:id')
   updateSystemUser(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateSystemUserDto: UpdateSystemUserDto,
     @GetSystemUser() systemUser: SystemUser,
   ): Promise<SystemUser> {
+    this.logger.verbose(
+      `SystemUser ${
+        systemUser.username
+      } trying to update systemusers with ID ${id} and new data ${JSON.stringify(
+        updateSystemUserDto,
+      )}`,
+    );
     return this.authService.updateSystemUser(
       id,
       updateSystemUserDto,
@@ -61,8 +101,8 @@ export class AuthController {
     );
   }
 
-  @Post('/systemUser/createSuperAdmin')
-  createSuperAdmin() {
+  @Post('/createSuperAdmin')
+  createSuperAdmin(): Promise<void> {
     if (process.env.NODE_ENV !== 'production') {
       const superAdminDTO: CreateSystemUserDto = {
         email: 'test@example.ru',

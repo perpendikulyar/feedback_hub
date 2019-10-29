@@ -9,6 +9,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { SystemUserStatus } from './system-user-status.enum';
+import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
+import e = require('express');
 
 @EntityRepository(SystemUser)
 export class SystemUserRepository extends Repository<SystemUser> {
@@ -43,6 +45,48 @@ export class SystemUserRepository extends Repository<SystemUser> {
         );
         throw new InternalServerErrorException();
       }
+    }
+  }
+
+  async getSystemUsers(
+    getSystemUsersFilterDto: GetSystemUsersFilterDto,
+  ): Promise<SystemUser[]> {
+    const { email, username, status, role } = getSystemUsersFilterDto;
+
+    const query = this.createQueryBuilder('systemUser');
+
+    if (status) {
+      query.andWhere('systemUser.status = :stats', { status });
+    }
+
+    if (role) {
+      query.andWhere('systemUser.role = :role', { role });
+    }
+
+    if (email) {
+      query.andWhere('systemUser.email like :email', { email: `%${email}%` });
+    }
+
+    if (username) {
+      query.andWhere('systemUser.email like :email', {
+        username: `%${username}%`,
+      });
+    }
+
+    try {
+      const systemUsers: SystemUser[] = await query
+        .orderBy('systemUser.id', 'DESC')
+        .getMany();
+      this.logger.verbose(`systemUsers successfully served`);
+      return systemUsers;
+    } catch (error) {
+      this.logger.error(
+        `Failed on fetching system users with filter: ${JSON.stringify(
+          getSystemUsersFilterDto,
+        )}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
     }
   }
 

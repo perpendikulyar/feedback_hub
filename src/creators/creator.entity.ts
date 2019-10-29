@@ -8,7 +8,7 @@ import {
   Index,
 } from 'typeorm';
 import { Record } from '../records/record.entity';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 
 @Entity()
 export class Creator extends BaseEntity {

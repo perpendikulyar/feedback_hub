@@ -5,8 +5,9 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordStatus } from './record-status.enum';
 import { Creator } from '../creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
+import { SystemUserRole } from '../system-user/system-user-role.enum';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {
@@ -30,9 +31,11 @@ export class RecordRepository extends Repository<Record> {
 
     const query = this.createQueryBuilder('record');
 
-    query.where('record.systemUserId = :systemUserId', {
-      systemUserId: systemUser.id,
-    });
+    if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
+      query.andWhere('record.systemUserId = :systemUserId', {
+        systemUserId: systemUser.id,
+      });
+    }
 
     if (status) {
       query.andWhere('record.status = :status', { status });
@@ -103,7 +106,8 @@ export class RecordRepository extends Repository<Record> {
       const records: Record[] = await query
         .orderBy('record.id', 'DESC')
         .getMany();
-      this.logger.verbose('Records successfuly served');
+      this.logger.verbose(`Records successfully served`);
+
       return records;
     } catch (error) {
       this.logger.error('Failed on getting all records', error.stack);

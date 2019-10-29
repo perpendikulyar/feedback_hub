@@ -13,9 +13,9 @@ import { CreateRecordDto } from './dto/create-rcord.dto';
 import { Creator } from 'src/creators/creator.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
-import { SystemUserRole } from '../auth/system-user-role.enum';
+import { SystemUserRole } from '../system-user/system-user-role.enum';
 import { DeleteResult } from 'typeorm';
 
 @Injectable()

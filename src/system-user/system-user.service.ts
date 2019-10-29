@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SystemUserRepository } from './systemUser.repository';
+import { SystemUserRepository } from './system-user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
@@ -17,6 +17,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,8 +40,8 @@ export class AuthService {
         );
         return this.systemUserRepository.createSystemUser(createSystemUserDto);
       } else {
-        this.logger.verbose(
-          `Someone trying to reach creating new user service`,
+        this.logger.warn(
+          `User ${systemUser.username} has no access to create system users`,
         );
         throw new NotFoundException();
       }
@@ -75,6 +76,43 @@ export class AuthService {
     return { accessToken };
   }
 
+  async getSystemUsers(
+    getSystemUsersFilterDto: GetSystemUsersFilterDto,
+    systemUser: SystemUser,
+  ): Promise<SystemUser[]> {
+    if (systemUser.role === SystemUserRole.SUPER_ADMIN) {
+      this.logger.verbose('Fetching systemUsers ...');
+      return await this.systemUserRepository.getSystemUsers(
+        getSystemUsersFilterDto,
+      );
+    } else {
+      this.logger.warn(
+        `SystemUser ${systemUser.username} has no access to fetch systemUsers`,
+      );
+      throw new NotFoundException();
+    }
+  }
+
+  async getSystemUserById(
+    id: number,
+    systemUser: SystemUser,
+  ): Promise<SystemUser> {
+    if (systemUser.role === SystemUserRole.SUPER_ADMIN) {
+      const found: SystemUser = await this.systemUserRepository.findOne({ id });
+      if (!found) {
+        this.logger.verbose(`SystemUser with id ${id} does not exist`);
+        throw new NotFoundException(`SystemUser with id ${id} does not exist`);
+      }
+      this.logger.verbose(`SystemUser with id ${id} successfully found`);
+      return found;
+    } else {
+      this.logger.warn(
+        `SystemUser ${systemUser.username} has no access to fetch systemUsers`,
+      );
+      throw new NotFoundException();
+    }
+  }
+
   async updateSystemUser(
     id: number,
     updateSystemUserDto: UpdateSystemUserDto,
@@ -83,24 +121,18 @@ export class AuthService {
     const { role, status } = updateSystemUserDto;
 
     if (!status && !role) {
-      this.logger.verbose('No properties to updete are declareted');
+      this.logger.warn('No properties to updete are declareted');
       throw new BadRequestException('No properties to updete are declareted');
     }
 
     if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
-      this.logger.verbose(
-        `User ${systemUser.username} trying to update SustemUser with ID ${id}`,
+      this.logger.warn(
+        `User ${systemUser.username} has no access to update systemUsers`,
       );
       throw new NotFoundException();
     }
 
-    const updatable: SystemUser = await this.systemUserRepository.findOne({
-      id,
-    });
-
-    if (!updatable) {
-      throw new NotFoundException(`SystemUser with ID ${id} not found`);
-    }
+    const updatable: SystemUser = await this.getSystemUserById(id, systemUser);
 
     if (status) {
       updatable.status = status;

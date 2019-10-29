@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { CreatorRepository } from './creator.repository';
-import { SystemUser } from '../auth/system-user.entity';
+import { SystemUser } from '../system-user/system-user.entity';
 
 const mockCreatorHach = 'testHash';
 
