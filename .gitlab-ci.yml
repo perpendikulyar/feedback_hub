@@ -6,9 +6,32 @@ cache:
 
 stages:
   - test
+  - build
 
-test_async:
+unit_test:
   stage: test
-  script:
+  variables:
+    NODE_ENV: test
+  before_script:
     - npm install
+  script:
     - npm run test
+
+build_test:
+  services:
+    - postgres:11-alpine
+  stage: build
+  variables:
+    POSTGRES_DB: frmfeedback
+    POSRGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    NODE_ENV: development
+    RDS_HOSTNAME: postgres
+    RDS_USERNAME: postgres
+    RDS_PASSWORD: postgres
+    RDS_DB_NAME: frmfeedback
+    TYPEORM_SYNC: true
+  before_script:
+    - npm install
+  script:
+    - npm run start
