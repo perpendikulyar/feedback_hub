@@ -7,6 +7,15 @@ import {
   IsIn,
   IsNumber,
 } from 'class-validator';
+import { SortOrder } from '../../utility/sortOrder.enum';
+
+export enum SystemUserSortBy {
+  ID = 'systemUser.id',
+  USERNAME = 'systemUser.username',
+  EMAIL = 'systemUser.email',
+  STATUS = 'systemUser.status',
+  ROLE = 'systemUser.role',
+}
 
 export class GetSystemUsersFilterDto {
   @IsOptional()
@@ -28,4 +37,18 @@ export class GetSystemUsersFilterDto {
   @IsOptional()
   @IsNumber()
   page: number;
+
+  @IsOptional()
+  @IsIn([
+    SystemUserSortBy.EMAIL,
+    SystemUserSortBy.ID,
+    SystemUserSortBy.ROLE,
+    SystemUserSortBy.STATUS,
+    SystemUserSortBy.USERNAME,
+  ])
+  sortBy: SystemUserSortBy;
+
+  @IsOptional()
+  @IsIn([SortOrder.DESC, SortOrder.ASC])
+  sortOrder: SortOrder;
 }

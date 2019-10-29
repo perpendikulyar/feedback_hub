@@ -13,7 +13,6 @@ import { SystemUser } from './system-user.entity';
 import { UpdateSystemUserDto } from './dto/update-system-user.dto';
 import { SystemUserStatus } from './system-user-status.enum';
 import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
-import { async } from 'rxjs/internal/scheduler/async';
 
 describe('System User Service', () => {
   let systemUserService: SystemUserService;
