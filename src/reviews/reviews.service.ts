@@ -66,10 +66,10 @@ export class ReviewsService {
       this.logger.verbose(
         `SytemUser "${systemUser.username}" has no access to delete reviews`,
       );
+      throw new NotFoundException();
     }
     const result: DeleteResult = await this.reviewRepository.delete({
       id,
-      systemUserId: systemUser.id,
     });
 
     if (result && result.affected === 0) {
