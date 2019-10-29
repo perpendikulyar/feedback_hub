@@ -16,5 +16,10 @@ async function bootstrap() {
 
   logger.log(`App running on port ${port}`);
   logger.log(`App running in ${process.env.NODE_ENV} mode`);
+
+  if (process.env.NODE_ENV === 'gitlab_runner') {
+    logger.debug(`Test run complete`);
+    app.close();
+  }
 }
 bootstrap();

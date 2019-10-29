@@ -5,16 +5,24 @@ cache:
     - node_modules/
 
 stages:
+  - build
   - test
 
-# unit_test:
-#   stage: test
-#   variables:
-#     NODE_ENV: test
-#   before_script:
-#     - npm install
-#   script:
-#     - npm run test
+build:
+  stage: build
+  before_script:
+    - npm install
+  script:
+    - npm run build
+
+unit_test:
+  stage: test
+  variables:
+    NODE_ENV: test
+  before_script:
+    - npm install
+  script:
+    - npm run test
 
 run_test:
   services:
@@ -25,7 +33,7 @@ run_test:
     POSTGRES_DB: frmfeedback
     POSRGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
-    NODE_ENV: development
+    NODE_ENV: gitlab_runner
     RDS_HOSTNAME: postgres
     RDS_USERNAME: postgres
     RDS_PASSWORD: postgres
@@ -35,5 +43,3 @@ run_test:
     - npm install
   script:
     - npm run start
-  after_script:
-    - echo 'hello'
