@@ -25,4 +25,4 @@ const jwtConfig = config.get('jwt');
   providers: [SystemUserService, JwtStrategy],
   exports: [JwtStrategy, PassportModule],
 })
-export class AuthModule {}
+export class SystemUserModule {}
