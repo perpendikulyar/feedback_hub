@@ -6,21 +6,20 @@ cache:
 
 stages:
   - test
-  - build
 
-unit_test:
-  stage: test
-  variables:
-    NODE_ENV: test
-  before_script:
-    - npm install
-  script:
-    - npm run test
+# unit_test:
+#   stage: test
+#   variables:
+#     NODE_ENV: test
+#   before_script:
+#     - npm install
+#   script:
+#     - npm run test
 
-build_test:
+run_test:
   services:
     - postgres:11-alpine
-  stage: build
+  stage: test
 
   variables:
     POSTGRES_DB: frmfeedback
@@ -36,3 +35,5 @@ build_test:
     - npm install
   script:
     - npm run start
+  after_script:
+    - echo 'hello'
