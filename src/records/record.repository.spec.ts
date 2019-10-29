@@ -1,5 +1,5 @@
 import { SystemUser } from '../system-user/system-user.entity';
-import { Creator } from '../creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { RecordType } from './record-type.enum';
@@ -11,8 +11,8 @@ import { RecordStatus } from './record-status.enum';
 describe('RecordRepository', () => {
   let recordRepository;
 
-  const mockCreator = new Creator();
-  mockCreator.id = 1;
+  const mockAuthor = new Author();
+  mockAuthor.id = 1;
 
   const mockSystemUser = new SystemUser();
   mockSystemUser.id = 1;
@@ -56,7 +56,7 @@ describe('RecordRepository', () => {
 
       const result = await recordRepository.createRecord(
         mockCreateRecordDto,
-        mockCreator,
+        mockAuthor,
         mockSystemUser,
         mockReq,
       );

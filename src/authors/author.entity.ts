@@ -11,18 +11,18 @@ import { Record } from '../records/record.entity';
 import { SystemUser } from '../system-user/system-user.entity';
 
 @Entity()
-export class Creator extends BaseEntity {
+export class Author extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Index()
   @Column()
-  creatorHash: string;
+  authorHash: string;
 
-  @OneToMany(type => Record, record => record.creator, { eager: true })
+  @OneToMany(type => Record, record => record.author, { eager: true })
   records: Record[];
 
-  @ManyToOne(type => SystemUser, systemUser => systemUser.creators, {
+  @ManyToOne(type => SystemUser, systemUser => systemUser.authors, {
     eager: false,
   })
   systemUser: SystemUser;

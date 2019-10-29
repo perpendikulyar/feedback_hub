@@ -2,8 +2,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { Record } from './record.entity';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { RecordStatus } from './record-status.enum';
-import { Creator } from '../creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
@@ -19,7 +18,7 @@ export class RecordRepository extends Repository<Record> {
   ): Promise<Record[]> {
     const {
       status,
-      creatorId,
+      authorId,
       searchQuery,
       type,
       creationStartDate,
@@ -41,8 +40,8 @@ export class RecordRepository extends Repository<Record> {
       query.andWhere('record.status = :status', { status });
     }
 
-    if (creatorId) {
-      query.andWhere('record.creatorId = :creatorId', { creatorId });
+    if (authorId) {
+      query.andWhere('record.authorId = :authorId', { authorId });
     }
 
     if (type) {
@@ -117,7 +116,7 @@ export class RecordRepository extends Repository<Record> {
 
   async createRecord(
     createRecordDto: CreateRecordDto,
-    creator: Creator,
+    author: Author,
     systemUser: SystemUser,
     req: Request,
   ): Promise<Record> {
@@ -127,26 +126,26 @@ export class RecordRepository extends Repository<Record> {
     record.title = title;
     record.description = description;
     record.type = type;
-    record.creator = creator;
+    record.author = author;
     record.systemUser = systemUser;
-    record.creatorIp = req.connection.remoteAddress;
-    record.creatorUserAgent = req.get('User-Agent');
+    record.authorIp = req.connection.remoteAddress;
+    record.authorUserAgent = req.get('User-Agent');
 
     try {
       await record.save();
 
-      delete record.creator;
+      delete record.author;
       delete record.systemUser;
 
       this.logger.verbose(
-        `New record successfuly created by creator: ${JSON.stringify(creator)}`,
+        `New record successfuly created by autor: ${JSON.stringify(author)}`,
       );
       return record;
     } catch (error) {
       this.logger.error(
         `Failed on creting new record with data: ${JSON.stringify(
           createRecordDto,
-        )}; and creator: ${JSON.stringify(creator)}`,
+        )}; and autor: ${JSON.stringify(author)}`,
         error.stack,
       );
       throw new InternalServerErrorException();

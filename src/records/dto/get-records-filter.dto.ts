@@ -28,7 +28,7 @@ export class GetRecordsFilterDto {
 
   @IsOptional()
   @IsNotEmpty()
-  creatorId: number;
+  authorId: number;
 
   @IsOptional()
   @IsNotEmpty()

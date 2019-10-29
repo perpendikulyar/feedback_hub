@@ -17,15 +17,15 @@ import { Request } from 'express';
 import { RecordsService } from './records.service';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { CreatorHashValidationPipe } from '../creators/pipes/creator-hash-validation.pipe';
+import { AuthorHashValidationPipe } from '../authors/pipes/author-hash-validation.pipe';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GetSystemUser } from '../system-user/get-system-user.decorator';
 import { SystemUser } from '../system-user/system-user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { Logger } from '@nestjs/common';
-import { CreatorsService } from '../creators/creators.service';
-import { Creator } from 'src/creators/creator.entity';
+import { AutorsService } from '../authors/authors.service';
+import { Author } from '../authors/author.entity';
 
 @Controller('records')
 @UseGuards(AuthGuard())
@@ -34,14 +34,14 @@ export class RecordsController {
 
   constructor(
     private recordsService: RecordsService,
-    private creatorsService: CreatorsService,
+    private authorsService: AutorsService,
   ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
   async createRecord(
     @Body() createRecordDto: CreateRecordDto,
-    @Body('creatorHash', CreatorHashValidationPipe) creatorHash: string,
+    @Body('authorHash', AuthorHashValidationPipe) authorHash: string,
     @GetSystemUser() systemUser: SystemUser,
     @Req() req: Request,
   ): Promise<Record> {
@@ -50,17 +50,17 @@ export class RecordsController {
         systemUser.username
       }" trying to create new record with data: ${JSON.stringify(
         createRecordDto,
-      )}; and creator hash: ${creatorHash}`,
+      )}; and author hash: ${authorHash}`,
     );
 
-    const creator: Creator = await this.creatorsService.mergeCreator(
-      creatorHash,
+    const author: Author = await this.authorsService.mergeAuthor(
+      authorHash,
       systemUser,
     );
 
     return this.recordsService.createRecord(
       createRecordDto,
-      creator,
+      author,
       systemUser,
       req,
     );

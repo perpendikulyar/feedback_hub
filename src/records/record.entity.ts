@@ -7,10 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  In,
 } from 'typeorm';
 import { RecordStatus } from './record-status.enum';
-import { Creator } from '../creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { RecordType } from './record-type.enum';
 import { SystemUser } from '../system-user/system-user.entity';
 
@@ -48,11 +47,11 @@ export class Record extends BaseEntity {
   @UpdateDateColumn()
   lastUpdateDate: Date;
 
-  @ManyToOne(type => Creator, creator => creator.records, { eager: false })
-  creator: Creator;
+  @ManyToOne(type => Author, author => author.records, { eager: false })
+  author: Author;
 
   @Column()
-  creatorId: number;
+  authorId: number;
 
   @ManyToOne(type => SystemUser, systemUser => systemUser.records, {
     eager: false,
@@ -64,8 +63,8 @@ export class Record extends BaseEntity {
   systemUserId: number;
 
   @Column()
-  creatorIp: string;
+  authorIp: string;
 
   @Column()
-  creatorUserAgent: string;
+  authorUserAgent: string;
 }
