@@ -1,6 +1,12 @@
 import { SystemUserStatus } from '../system-user-status.enum';
 import { SystemUserRole } from '../system-user-role.enum';
-import { IsOptional, IsNotEmpty, IsEmail, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsNotEmpty,
+  IsEmail,
+  IsIn,
+  IsNumber,
+} from 'class-validator';
 
 export class GetSystemUsersFilterDto {
   @IsOptional()
@@ -18,4 +24,8 @@ export class GetSystemUsersFilterDto {
   @IsOptional()
   @IsIn([SystemUserRole.SUPER_ADMIN, SystemUserRole.API_USER])
   role: SystemUserRole;
+
+  @IsOptional()
+  @IsNumber()
+  page: number;
 }
