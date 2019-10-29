@@ -34,7 +34,6 @@ describe('ProblemsService', () => {
   const mockSystemUser = new SystemUser();
   mockSystemUser.id = 1;
   mockSystemUser.username = 'TestUsername';
-  mockSystemUser.role = SystemUserRole.API_USER;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -46,6 +45,7 @@ describe('ProblemsService', () => {
 
     problemsService = await module.get<ProblemsService>(ProblemsService);
     problemRepository = await module.get<ProblemRepository>(ProblemRepository);
+    mockSystemUser.role = SystemUserRole.API_USER;
   });
 
   describe('getProblems', () => {
@@ -71,21 +71,21 @@ describe('ProblemsService', () => {
   });
 
   describe('createProblem', () => {
+    const mockCreateProblemDto = new CreateProblemDto();
+    mockCreateProblemDto.title = 'TestProblem';
+    mockCreateProblemDto.description = 'TestDesc';
+    mockCreateProblemDto.type = ProblemType.ADVERTISEMENT;
+
+    const mockAuthor = new Author();
+    mockAuthor.id = 12;
+
+    const mockReq = ({
+      connection: { remoteAddress: '::1' },
+      get: jest.fn(),
+    } as unknown) as Request;
+
     it('Should call problemRepository.createProblem', async () => {
       problemRepository.createProblem.mockResolvedValue(mockProblem);
-
-      const mockCreateProblemDto = new CreateProblemDto();
-      mockCreateProblemDto.title = 'TestProblem';
-      mockCreateProblemDto.description = 'TestDesc';
-      mockCreateProblemDto.type = ProblemType.ADVERTISEMENT;
-
-      const mockAuthor = new Author();
-      mockAuthor.id = 12;
-
-      const mockReq = ({
-        connection: { remoteAddress: '::1' },
-        get: jest.fn(),
-      } as unknown) as Request;
 
       const result = await problemsService.createProblem(
         mockCreateProblemDto,
@@ -104,7 +104,7 @@ describe('ProblemsService', () => {
   });
 
   describe('getProblemById', () => {
-    it('Should call problemRepository.findOne and returns a problem', async () => {
+    it('Should call problemRepository.findOne and returns a problem to api systemUser', async () => {
       problemRepository.findOne.mockResolvedValue(mockProblem);
 
       const result = await problemsService.getProblemById(1, mockSystemUser);
@@ -114,41 +114,53 @@ describe('ProblemsService', () => {
       expect(result).toEqual(mockProblem);
     });
 
+    it('Should call problemRepository.findOne and returns a problem to super_admin systemUser', async () => {
+      mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
+      problemRepository.findOne.mockResolvedValue(mockProblem);
+
+      const result = await problemsService.getProblemById(1, mockSystemUser);
+      expect(problemRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
+      expect(result).toEqual(mockProblem);
+    });
+
     it('Should call problemRepository.findOne and returns NotFoundException', async () => {
       problemRepository.findOne.mockResolvedValue(null);
-
-      expect(problemsService.getProblemById(1, mockSystemUser)).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = problemsService.getProblemById(1, mockSystemUser);
+      expect(problemRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+          systemUserId: mockSystemUser.id,
+        },
+      });
+      expect(result).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('deleteProblem', () => {
     it('Should call problemRepository.delete and successfully delete a problem', async () => {
       mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
-
       problemRepository.delete.mockResolvedValue({ affected: 1 });
       await problemsService.deleteProblem(1, mockSystemUser);
       expect(problemRepository.delete).toHaveBeenCalledWith({
         id: 1,
-        systemUserId: mockSystemUser.id,
       });
     });
 
     it('Should call problemRepository.delete and returs NotFoundException', () => {
       mockSystemUser.role = SystemUserRole.SUPER_ADMIN;
       problemRepository.delete.mockResolvedValue({ affected: 0 });
-
       expect(problemsService.deleteProblem(1, mockSystemUser)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it('Should return NotFoundError if user is not a super_admin', async () => {
-      mockSystemUser.role = SystemUserRole.API_USER;
+    it('Should return NotFoundError if user is not a super_admin', () => {
       expect(problemsService.deleteProblem(1, mockSystemUser)).rejects.toThrow(
         NotFoundException,
       );
+      expect(problemRepository.delete).not.toHaveBeenCalled();
     });
   });
 

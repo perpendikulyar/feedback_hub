@@ -48,9 +48,16 @@ export class ProblemsService {
   }
 
   async getProblemById(id: number, systemUser: SystemUser): Promise<Problem> {
-    const found = await this.problemRepository.findOne({
-      where: { id, systemUserId: systemUser.id },
-    });
+    let found: Problem;
+    if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
+      found = await this.problemRepository.findOne({
+        where: { id, systemUserId: systemUser.id },
+      });
+    } else {
+      found = await this.problemRepository.findOne({
+        where: { id },
+      });
+    }
 
     if (!found) {
       this.logger.verbose(`Problem with ID ${id} not found`);
@@ -71,7 +78,6 @@ export class ProblemsService {
 
     const result: DeleteResult = await this.problemRepository.delete({
       id,
-      systemUserId: systemUser.id,
     });
 
     if (result && result.affected === 0) {
