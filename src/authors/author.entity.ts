@@ -7,7 +7,7 @@ import {
   ManyToOne,
   Index,
 } from 'typeorm';
-import { Record } from '../records/record.entity';
+import { Problem } from '../problems/problem.entity';
 import { SystemUser } from '../system-user/system-user.entity';
 
 @Entity()
@@ -19,8 +19,8 @@ export class Author extends BaseEntity {
   @Column()
   authorHash: string;
 
-  @OneToMany(type => Record, record => record.author, { eager: true })
-  records: Record[];
+  @OneToMany(type => Problem, problem => problem.author, { eager: true })
+  problems: Problem[];
 
   @ManyToOne(type => SystemUser, systemUser => systemUser.authors, {
     eager: false,

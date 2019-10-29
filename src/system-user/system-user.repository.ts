@@ -14,6 +14,7 @@ import {
 } from './dto/get-system-users-filter.dto';
 import { SystemUserStatus } from './system-user-status.enum';
 import { SystemUser } from './system-user.entity';
+import { ENTRIES_PER_PAGE } from '../utility/constants';
 
 @EntityRepository(SystemUser)
 export class SystemUserRepository extends Repository<SystemUser> {
@@ -84,11 +85,9 @@ export class SystemUserRepository extends Repository<SystemUser> {
       });
     }
 
-    const entitiesPerPage = 10;
+    query.take((page ? page : 1) * ENTRIES_PER_PAGE);
 
-    query.take((page ? page : 1) * entitiesPerPage);
-
-    query.skip((page ? page : 1) * entitiesPerPage - entitiesPerPage);
+    query.skip((page ? page : 1) * ENTRIES_PER_PAGE - ENTRIES_PER_PAGE);
 
     try {
       const systemUsers: SystemUser[] = await query
