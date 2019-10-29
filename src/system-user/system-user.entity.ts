@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import { Record } from '../records/record.entity';
-import { Creator } from '../creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { SystemUserRole } from './system-user-role.enum';
 import { SystemUserStatus } from './system-user-status.enum';
 import {
@@ -59,8 +59,8 @@ export class SystemUser extends BaseEntity {
   @OneToMany(type => Record, record => record.systemUser, { eager: true })
   records: Record[];
 
-  @OneToMany(type => Creator, creator => creator.systemUser, { eager: true })
-  creators: Creator[];
+  @OneToMany(type => Author, author => author.systemUser, { eager: true })
+  authors: Author[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

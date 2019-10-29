@@ -3,19 +3,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RecordRepository } from './record.repository';
 import { RecordsController } from './records.controller';
 import { RecordsService } from './records.service';
-import { CreatorsModule } from '../creators/creators.module';
-import { CreatorsService } from '../creators/creators.service';
-import { CreatorRepository } from '../creators/creator.repository';
+import { AuthorModule } from '../authors/author.module';
+import { AutorsService } from '../authors/authors.service';
+import { AuthorRepository } from '../authors/author.repository';
 import { AuthModule } from '../system-user/system-user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([RecordRepository]),
-    TypeOrmModule.forFeature([CreatorRepository]),
-    CreatorsModule,
+    TypeOrmModule.forFeature([AuthorRepository]),
+    AuthorModule,
     AuthModule,
   ],
   controllers: [RecordsController],
-  providers: [RecordsService, CreatorsService],
+  providers: [RecordsService, AutorsService],
 })
 export class RecordsModule {}

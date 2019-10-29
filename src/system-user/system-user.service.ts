@@ -148,7 +148,7 @@ export class SystemUserService {
         )} by ${systemUser.username}`,
       );
       delete updatable.records;
-      delete updatable.creators;
+      delete updatable.authors;
       return updatable;
     } catch (error) {
       this.logger.error(

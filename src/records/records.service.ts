@@ -5,12 +5,11 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { RecordRepository } from './record.repository';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { Creator } from 'src/creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { SystemUser } from '../system-user/system-user.entity';
@@ -36,13 +35,13 @@ export class RecordsService {
 
   async createRecord(
     createRecordDto: CreateRecordDto,
-    creator: Creator,
+    author: Author,
     systemUser: SystemUser,
     req: Request,
   ): Promise<Record> {
     return await this.recordRepository.createRecord(
       createRecordDto,
-      creator,
+      author,
       systemUser,
       req,
     );

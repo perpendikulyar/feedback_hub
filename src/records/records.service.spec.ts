@@ -6,7 +6,7 @@ import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
 import { RecordStatus } from './record-status.enum';
 import { RecordType } from './record-type.enum';
 import { CreateRecordDto } from './dto/create-rcord.dto';
-import { Creator } from '../creators/creator.entity';
+import { Author } from '../authors/author.entity';
 import { Request } from 'express';
 import { Record } from './record.entity';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
@@ -55,7 +55,7 @@ describe('RecordsService', () => {
       const mockRecordsFilterDto = new GetRecordsFilterDto();
       mockRecordsFilterDto.status = RecordStatus.NEW;
       mockRecordsFilterDto.type = RecordType.MISPRINT;
-      mockRecordsFilterDto.creatorId = 12;
+      mockRecordsFilterDto.authorId = 12;
       mockRecordsFilterDto.searchQuery = 'testSearchQuery';
 
       const result = await recordsService.getRecords(
@@ -79,8 +79,8 @@ describe('RecordsService', () => {
       mockCreateRecordDto.description = 'TestDesc';
       mockCreateRecordDto.type = RecordType.ADVERTISEMENT;
 
-      const mockCrerator = new Creator();
-      mockCrerator.id = 12;
+      const mockAuthor = new Author();
+      mockAuthor.id = 12;
 
       const mockReq = ({
         connection: { remoteAddress: '::1' },
@@ -89,13 +89,13 @@ describe('RecordsService', () => {
 
       const result = await recordsService.createRecord(
         mockCreateRecordDto,
-        mockCrerator,
+        mockAuthor,
         mockSystemUser,
         mockReq,
       );
       expect(recordRepository.createRecord).toHaveBeenCalledWith(
         mockCreateRecordDto,
-        mockCrerator,
+        mockAuthor,
         mockSystemUser,
         mockReq,
       );
