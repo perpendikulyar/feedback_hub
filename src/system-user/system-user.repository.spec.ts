@@ -9,6 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { SystemUserRole } from './system-user-role.enum';
 import { SystemUserStatus } from './system-user-status.enum';
+import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
 
 const mockCredentialsDto = {
   emaol: 'test@example.ru',
@@ -34,7 +35,7 @@ describe('SystemUserRepository', () => {
     );
   });
 
-  describe('createSystemUserRepository', () => {
+  describe('createSystemUser', () => {
     let save;
 
     beforeEach(() => {
@@ -125,6 +126,21 @@ describe('SystemUserRepository', () => {
       );
       expect(bcrypt.hash).toHaveBeenCalledWith('testPassword', 'testSalt');
       expect(result).toEqual('testHash');
+    });
+  });
+
+  describe('getSystemUsers', () => {
+    it('Successfully returns systemUsers with query', async () => {
+      const mockFilterDto = new GetSystemUsersFilterDto();
+      mockFilterDto.status = SystemUserStatus.ACTIVE;
+
+      spyOn(systemUserRepository, 'getSystemUsers').and.returnValue([
+        'user',
+        'user',
+      ]);
+
+      const result = await systemUserRepository.getSystemUsers(mockFilterDto);
+      expect(result).toEqual(['user', 'user']);
     });
   });
 });

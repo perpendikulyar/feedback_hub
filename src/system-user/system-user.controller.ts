@@ -11,7 +11,7 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { AuthService } from './system-user.service';
+import { SystemUserService } from './system-user.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,10 +23,10 @@ import { UpdateSystemUserDto } from './dto/update-system-user.dto';
 import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
 
 @Controller('systemUsers')
-export class AuthController {
-  private readonly logger = new Logger('AuthController');
+export class SystemUserController {
+  private readonly logger = new Logger('SystemUserController');
 
-  constructor(private authService: AuthService) {}
+  constructor(private sytemUserService: SystemUserService) {}
 
   @UseGuards(AuthGuard())
   @Post()
@@ -39,7 +39,10 @@ export class AuthController {
         createSystemUserDto.username
       }"`,
     );
-    return this.authService.createSystemUser(createSystemUserDto, systemUser);
+    return this.sytemUserService.createSystemUser(
+      createSystemUserDto,
+      systemUser,
+    );
   }
 
   @UseGuards(AuthGuard())
@@ -55,7 +58,10 @@ export class AuthController {
         getSystemUsersFilterDto,
       )}`,
     );
-    return this.authService.getSystemUsers(getSystemUsersFilterDto, systemUser);
+    return this.sytemUserService.getSystemUsers(
+      getSystemUsersFilterDto,
+      systemUser,
+    );
   }
 
   @UseGuards(AuthGuard())
@@ -69,7 +75,7 @@ export class AuthController {
         systemUser.username
       } trying to fetch systemUsers with ID ${id}`,
     );
-    return this.authService.getSystemUserById(id, systemUser);
+    return this.sytemUserService.getSystemUserById(id, systemUser);
   }
 
   @Post('/signin')
@@ -77,7 +83,7 @@ export class AuthController {
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
     this.logger.verbose(`User trying to sign in`);
-    return this.authService.signIn(authCredentialsDto);
+    return this.sytemUserService.signIn(authCredentialsDto);
   }
 
   @UseGuards(AuthGuard())
@@ -94,7 +100,7 @@ export class AuthController {
         updateSystemUserDto,
       )}`,
     );
-    return this.authService.updateSystemUser(
+    return this.sytemUserService.updateSystemUser(
       id,
       updateSystemUserDto,
       systemUser,
@@ -111,7 +117,7 @@ export class AuthController {
         role: SystemUserRole.SUPER_ADMIN,
       };
       this.logger.debug('Creating systemUser with role super_admin');
-      return this.authService.createSystemUser(superAdminDTO, null);
+      return this.sytemUserService.createSystemUser(superAdminDTO, null);
     } else {
       this.logger.verbose('Someone trying to create superadmin users');
       throw new NotFoundException();
