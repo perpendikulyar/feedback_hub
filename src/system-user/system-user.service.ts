@@ -146,7 +146,7 @@ export class SystemUserService {
           updateSystemUserDto,
         )} by ${systemUser.username}`,
       );
-      delete updatable.records;
+      delete updatable.problems;
       delete updatable.authors;
       return updatable;
     } catch (error) {

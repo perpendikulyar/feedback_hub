@@ -14,12 +14,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { RecordsService } from './records.service';
-import { Record } from './record.entity';
-import { CreateRecordDto } from './dto/create-rcord.dto';
+import { ProblemsService } from './problems.service';
+import { Problem } from './problem.entity';
+import { CreateProblemDto } from './dto/create-problem.dto';
 import { AuthorHashValidationPipe } from '../authors/pipes/author-hash-validation.pipe';
-import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
-import { UpdateRecordDto } from './dto/update-record.dto';
+import { GetProblemsFilterDto } from './dto/get-problems-filter.dto';
+import { UpdateProblemDto } from './dto/update-problem.dto';
 import { GetSystemUser } from '../system-user/get-system-user.decorator';
 import { SystemUser } from '../system-user/system-user.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -27,29 +27,29 @@ import { Logger } from '@nestjs/common';
 import { AutorsService } from '../authors/authors.service';
 import { Author } from '../authors/author.entity';
 
-@Controller('records')
+@Controller('problems')
 @UseGuards(AuthGuard())
-export class RecordsController {
-  private readonly logger = new Logger('RecordsController');
+export class ProblemsController {
+  private readonly logger = new Logger('ProblemsController');
 
   constructor(
-    private recordsService: RecordsService,
+    private problemsService: ProblemsService,
     private authorsService: AutorsService,
   ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
-  async createRecord(
-    @Body() createRecordDto: CreateRecordDto,
+  async createProblem(
+    @Body() createProblemDto: CreateProblemDto,
     @Body('authorHash', AuthorHashValidationPipe) authorHash: string,
     @GetSystemUser() systemUser: SystemUser,
     @Req() req: Request,
-  ): Promise<Record> {
+  ): Promise<Problem> {
     this.logger.verbose(
       `User "${
         systemUser.username
-      }" trying to create new record with data: ${JSON.stringify(
-        createRecordDto,
+      }" trying to create new problem with data: ${JSON.stringify(
+        createProblemDto,
       )}; and author hash: ${authorHash}`,
     );
 
@@ -58,8 +58,8 @@ export class RecordsController {
       systemUser,
     );
 
-    return this.recordsService.createRecord(
-      createRecordDto,
+    return this.problemsService.createProblem(
+      createProblemDto,
       author,
       systemUser,
       req,
@@ -67,55 +67,55 @@ export class RecordsController {
   }
 
   @Get()
-  getRecords(
-    @Query(ValidationPipe) getRecordsFilterDto: GetRecordsFilterDto,
+  getProblems(
+    @Query(ValidationPipe) getProblemsFilterDto: GetProblemsFilterDto,
     @GetSystemUser() systemUser: SystemUser,
-  ): Promise<Record[]> {
+  ): Promise<Problem[]> {
     this.logger.verbose(
       `User "${
         systemUser.username
-      }" trying to get records with filters: ${JSON.stringify(
-        getRecordsFilterDto,
+      }" trying to get problems with filters: ${JSON.stringify(
+        getProblemsFilterDto,
       )}`,
     );
-    return this.recordsService.getRecords(getRecordsFilterDto, systemUser);
+    return this.problemsService.getProblems(getProblemsFilterDto, systemUser);
   }
 
   @Get('/:id')
-  getRecordById(
+  getProblemById(
     @Param('id', ParseIntPipe) id: number,
     @GetSystemUser() systemUser: SystemUser,
-  ): Promise<Record> {
+  ): Promise<Problem> {
     this.logger.verbose(
-      `User "${systemUser.username}" trying to get record with id: ${id}`,
+      `User "${systemUser.username}" trying to get problem with id: ${id}`,
     );
-    return this.recordsService.getRecordById(id, systemUser);
+    return this.problemsService.getProblemById(id, systemUser);
   }
 
   @Patch('/:id')
-  updateRecord(
+  updateProblem(
     @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateRecordDto: UpdateRecordDto,
+    @Body(ValidationPipe) updateProblemDto: UpdateProblemDto,
     @GetSystemUser() systemUser: SystemUser,
-  ): Promise<Record> {
+  ): Promise<Problem> {
     this.logger.verbose(
       `User "${
         systemUser.username
-      }" trying to update record with id: ${id}; new data: ${JSON.stringify(
-        UpdateRecordDto,
+      }" trying to update problem with id: ${id}; new data: ${JSON.stringify(
+        updateProblemDto,
       )}`,
     );
-    return this.recordsService.updateRecord(id, updateRecordDto, systemUser);
+    return this.problemsService.updateProblem(id, updateProblemDto, systemUser);
   }
 
   @Delete('/:id')
-  deleteRecord(
+  deleteProblem(
     @Param('id', ParseIntPipe) id: number,
     @GetSystemUser() systemUser: SystemUser,
   ): Promise<void> {
     this.logger.verbose(
-      `User "${systemUser.username}" trying to delete record with id: ${id}`,
+      `User "${systemUser.username}" trying to delete problem with id: ${id}`,
     );
-    return this.recordsService.deleteRecord(id, systemUser);
+    return this.problemsService.deleteProblem(id, systemUser);
   }
 }

@@ -8,14 +8,14 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { RecordStatus } from './record-status.enum';
+import { ProblemStatus } from './problem-status.enum';
 import { Author } from '../authors/author.entity';
-import { RecordType } from './record-type.enum';
+import { ProblemType } from './problem-type.enum';
 import { SystemUser } from '../system-user/system-user.entity';
 
 @Entity()
 @Index(['title', 'description'])
-export class Record extends BaseEntity {
+export class Problem extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,18 +28,18 @@ export class Record extends BaseEntity {
   @Index()
   @Column({
     type: 'enum',
-    enum: RecordStatus,
-    default: RecordStatus.NEW,
+    enum: ProblemStatus,
+    default: ProblemStatus.NEW,
   })
-  status: RecordStatus;
+  status: ProblemStatus;
 
   @Index()
   @Column({
     type: 'enum',
-    enum: RecordType,
-    default: RecordType.NOTSET,
+    enum: ProblemType,
+    default: ProblemType.NOTSET,
   })
-  type: RecordType;
+  type: ProblemType;
 
   @CreateDateColumn()
   creationDate: Date;
@@ -47,13 +47,13 @@ export class Record extends BaseEntity {
   @UpdateDateColumn()
   lastUpdateDate: Date;
 
-  @ManyToOne(type => Author, author => author.records, { eager: false })
+  @ManyToOne(type => Author, author => author.problems, { eager: false })
   author: Author;
 
   @Column()
   authorId: number;
 
-  @ManyToOne(type => SystemUser, systemUser => systemUser.records, {
+  @ManyToOne(type => SystemUser, systemUser => systemUser.problems, {
     eager: false,
   })
   systemUser: SystemUser;

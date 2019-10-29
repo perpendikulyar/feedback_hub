@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcryptjs';
-import { Record } from '../records/record.entity';
+import { Problem } from '../problems/problem.entity';
 import { Author } from '../authors/author.entity';
 import { SystemUserRole } from './system-user-role.enum';
 import { SystemUserStatus } from './system-user-status.enum';
@@ -56,8 +56,8 @@ export class SystemUser extends BaseEntity {
   })
   status: SystemUserStatus;
 
-  @OneToMany(type => Record, record => record.systemUser, { eager: true })
-  records: Record[];
+  @OneToMany(type => Problem, problem => problem.systemUser, { eager: true })
+  problems: Problem[];
 
   @OneToMany(type => Author, author => author.systemUser, { eager: true })
   authors: Author[];

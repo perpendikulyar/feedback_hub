@@ -1,25 +1,26 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { Record } from './record.entity';
+import { Problem } from './problem.entity';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { CreateRecordDto } from './dto/create-rcord.dto';
+import { CreateProblemDto } from './dto/create-problem.dto';
 import { Author } from '../authors/author.entity';
 import {
-  GetRecordsFilterDto,
-  RecordsSortBy,
-} from './dto/get-records-filter.dto';
+  GetProblemsFilterDto,
+  ProblemSortBy,
+} from './dto/get-problems-filter.dto';
 import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
 import { SystemUserRole } from '../system-user/system-user-role.enum';
 import { SortOrder } from '../utility/sortOrder.enum';
+import { ENTRIES_PER_PAGE } from '../utility/constants';
 
-@EntityRepository(Record)
-export class RecordRepository extends Repository<Record> {
-  private readonly logger = new Logger('RecordRepository');
+@EntityRepository(Problem)
+export class ProblemRepository extends Repository<Problem> {
+  private readonly logger = new Logger('ProblemRepository');
 
-  async getRecords(
-    getRecordsFilterDto: GetRecordsFilterDto,
+  async getProblems(
+    getProblemsFilterDto: GetProblemsFilterDto,
     systemUser: SystemUser,
-  ): Promise<Record[]> {
+  ): Promise<Problem[]> {
     const {
       status,
       authorId,
@@ -32,31 +33,31 @@ export class RecordRepository extends Repository<Record> {
       page,
       sortBy,
       sortOrder,
-    } = getRecordsFilterDto;
+    } = getProblemsFilterDto;
 
-    const query = this.createQueryBuilder('record');
+    const query = this.createQueryBuilder('problem');
 
     if (systemUser.role !== SystemUserRole.SUPER_ADMIN) {
-      query.andWhere('record.systemUserId = :systemUserId', {
+      query.andWhere('problem.systemUserId = :systemUserId', {
         systemUserId: systemUser.id,
       });
     }
 
     if (status) {
-      query.andWhere('record.status = :status', { status });
+      query.andWhere('problem.status = :status', { status });
     }
 
     if (authorId) {
-      query.andWhere('record.authorId = :authorId', { authorId });
+      query.andWhere('problem.authorId = :authorId', { authorId });
     }
 
     if (type) {
-      query.andWhere('record.type = :type', { type });
+      query.andWhere('problem.type = :type', { type });
     }
 
     if (searchQuery) {
       query.andWhere(
-        'record.title LIKE :searchQuery OR record.description LIKE :searchQuery',
+        'problem.title LIKE :searchQuery OR problem.description LIKE :searchQuery',
         { searchQuery: `%${searchQuery}%` },
       );
     }
@@ -73,7 +74,7 @@ export class RecordRepository extends Repository<Record> {
         `Filtering cration date. from: ${fromDate}; till: ${tillDate}`,
       );
       query.andWhere(
-        'record.creationDate >= :fromDate AND record.creationDate <= :tillDate',
+        'problem.creationDate >= :fromDate AND problem.creationDate <= :tillDate',
         {
           fromDate,
           tillDate,
@@ -93,7 +94,7 @@ export class RecordRepository extends Repository<Record> {
         `Filtering updated date. from: ${fromDate}; till: ${tillDate}`,
       );
       query.andWhere(
-        'record.lastUpdateDate >= :fromDate AND record.lastUpdateDate <= :tillDate',
+        'problem.lastUpdateDate >= :fromDate AND problem.lastUpdateDate <= :tillDate',
         {
           fromDate,
           tillDate,
@@ -101,59 +102,57 @@ export class RecordRepository extends Repository<Record> {
       );
     }
 
-    const recordsPerPage = 10;
+    query.take((page ? page : 1) * ENTRIES_PER_PAGE);
 
-    query.take((page ? page : 1) * recordsPerPage);
-
-    query.skip((page ? page : 1) * recordsPerPage - recordsPerPage);
+    query.skip((page ? page : 1) * ENTRIES_PER_PAGE - ENTRIES_PER_PAGE);
 
     try {
-      const records: Record[] = await query
+      const problems: Problem[] = await query
         .orderBy(
-          sortBy ? sortBy : RecordsSortBy.ID,
+          sortBy ? sortBy : ProblemSortBy.ID,
           sortOrder ? sortOrder : SortOrder.DESC,
         )
         .getMany();
-      this.logger.verbose(`Records successfully served`);
+      this.logger.verbose(`Problems successfully served`);
 
-      return records;
+      return problems;
     } catch (error) {
-      this.logger.error('Failed on getting all records', error.stack);
+      this.logger.error('Failed on getting all problems', error.stack);
       throw new InternalServerErrorException();
     }
   }
 
-  async createRecord(
-    createRecordDto: CreateRecordDto,
+  async createProblem(
+    createProblemDto: CreateProblemDto,
     author: Author,
     systemUser: SystemUser,
     req: Request,
-  ): Promise<Record> {
-    const { title, description, type } = createRecordDto;
+  ): Promise<Problem> {
+    const { title, description, type } = createProblemDto;
 
-    const record = this.create();
-    record.title = title;
-    record.description = description;
-    record.type = type;
-    record.author = author;
-    record.systemUser = systemUser;
-    record.authorIp = req.connection.remoteAddress;
-    record.authorUserAgent = req.get('User-Agent');
+    const problem = this.create();
+    problem.title = title;
+    problem.description = description;
+    problem.type = type;
+    problem.author = author;
+    problem.systemUser = systemUser;
+    problem.authorIp = req.connection.remoteAddress;
+    problem.authorUserAgent = req.get('User-Agent');
 
     try {
-      await record.save();
+      await problem.save();
 
-      delete record.author;
-      delete record.systemUser;
+      delete problem.author;
+      delete problem.systemUser;
 
       this.logger.verbose(
-        `New record successfuly created by autor: ${JSON.stringify(author)}`,
+        `New problem successfuly created by autor: ${JSON.stringify(author)}`,
       );
-      return record;
+      return problem;
     } catch (error) {
       this.logger.error(
-        `Failed on creting new record with data: ${JSON.stringify(
-          createRecordDto,
+        `Failed on creting new problem with data: ${JSON.stringify(
+          createProblemDto,
         )}; and autor: ${JSON.stringify(author)}`,
         error.stack,
       );
