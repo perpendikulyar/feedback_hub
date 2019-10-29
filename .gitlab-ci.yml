@@ -21,6 +21,7 @@ build_test:
   services:
     - postgres:11-alpine
   stage: build
+
   variables:
     POSTGRES_DB: frmfeedback
     POSRGRES_USER: postgres
@@ -30,7 +31,7 @@ build_test:
     RDS_USERNAME: postgres
     RDS_PASSWORD: postgres
     RDS_DB_NAME: frmfeedback
-    TYPEORM_SYNC: true
+    TYPEORM_SYNC: 'true'
   before_script:
     - npm install
   script:
