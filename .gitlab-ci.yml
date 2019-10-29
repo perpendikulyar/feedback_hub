@@ -14,6 +14,10 @@ build:
     - npm install
   script:
     - npm run build
+  artifacts:
+    expire_in: 1 day
+    path:
+      - dist/
 
 unit_test:
   stage: test
@@ -24,16 +28,14 @@ unit_test:
   script:
     - npm run test
 
-run_test:
+test_run:
   services:
     - postgres:11-alpine
   stage: test
-
   variables:
     POSTGRES_DB: frmfeedback
     POSRGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
-    NODE_ENV: gitlab_runner
     RDS_HOSTNAME: postgres
     RDS_USERNAME: postgres
     RDS_PASSWORD: postgres
@@ -42,4 +44,6 @@ run_test:
   before_script:
     - npm install
   script:
-    - npm run start
+    - npm run start:gitlab
+  only:
+    - master
