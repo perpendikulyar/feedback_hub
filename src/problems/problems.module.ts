@@ -6,14 +6,14 @@ import { ProblemsService } from './problems.service';
 import { AuthorModule } from '../authors/author.module';
 import { AutorsService } from '../authors/authors.service';
 import { AuthorRepository } from '../authors/author.repository';
-import { AuthModule } from '../system-user/system-user.module';
+import { SystemUserModule } from '../system-user/system-user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProblemRepository]),
     TypeOrmModule.forFeature([AuthorRepository]),
     AuthorModule,
-    AuthModule,
+    SystemUserModule,
   ],
   controllers: [ProblemsController],
   providers: [ProblemsService, AutorsService],

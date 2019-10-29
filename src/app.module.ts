@@ -3,14 +3,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { ProblemsModule } from './problems/problems.module';
 import { AuthorModule } from './authors/author.module';
-import { AuthModule } from './system-user/system-user.module';
+import { SystemUserModule } from './system-user/system-user.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     ProblemsModule,
     AuthorModule,
-    AuthModule,
+    SystemUserModule,
+    ReviewsModule,
   ],
 })
 export class AppModule {}
