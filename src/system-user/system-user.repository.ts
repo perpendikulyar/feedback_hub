@@ -51,7 +51,7 @@ export class SystemUserRepository extends Repository<SystemUser> {
   async getSystemUsers(
     getSystemUsersFilterDto: GetSystemUsersFilterDto,
   ): Promise<SystemUser[]> {
-    const { email, username, status, role } = getSystemUsersFilterDto;
+    const { email, username, status, role, page } = getSystemUsersFilterDto;
 
     const query = this.createQueryBuilder('systemUser');
 
@@ -72,6 +72,12 @@ export class SystemUserRepository extends Repository<SystemUser> {
         username: `%${username}%`,
       });
     }
+
+    const entitiesPerPage = 10;
+
+    query.take((page ? page : 1) * entitiesPerPage);
+
+    query.skip((page ? page : 1) * entitiesPerPage - entitiesPerPage);
 
     try {
       const systemUsers: SystemUser[] = await query
