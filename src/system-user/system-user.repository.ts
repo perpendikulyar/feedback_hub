@@ -1,16 +1,19 @@
-import { EntityRepository, Repository } from 'typeorm';
-import { SystemUser } from './system-user.entity';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import * as bcrypt from 'bcryptjs';
-import { Logger } from '@nestjs/common';
-import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
 import {
   ConflictException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
+import { EntityRepository, Repository } from 'typeorm';
+import { SortOrder } from '../utility/sortOrder.enum';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { CreateSystemUserDto } from './dto/create-sytem-user.dto';
+import {
+  GetSystemUsersFilterDto,
+  SystemUserSortBy,
+} from './dto/get-system-users-filter.dto';
 import { SystemUserStatus } from './system-user-status.enum';
-import { GetSystemUsersFilterDto } from './dto/get-system-users-filter.dto';
-import e = require('express');
+import { SystemUser } from './system-user.entity';
 
 @EntityRepository(SystemUser)
 export class SystemUserRepository extends Repository<SystemUser> {
@@ -51,7 +54,15 @@ export class SystemUserRepository extends Repository<SystemUser> {
   async getSystemUsers(
     getSystemUsersFilterDto: GetSystemUsersFilterDto,
   ): Promise<SystemUser[]> {
-    const { email, username, status, role, page } = getSystemUsersFilterDto;
+    const {
+      email,
+      username,
+      status,
+      role,
+      page,
+      sortBy,
+      sortOrder,
+    } = getSystemUsersFilterDto;
 
     const query = this.createQueryBuilder('systemUser');
 
@@ -81,7 +92,10 @@ export class SystemUserRepository extends Repository<SystemUser> {
 
     try {
       const systemUsers: SystemUser[] = await query
-        .orderBy('systemUser.id', 'DESC')
+        .orderBy(
+          sortBy ? sortBy : SystemUserSortBy.ID,
+          sortOrder ? sortOrder : SortOrder.DESC,
+        )
         .getMany();
       this.logger.verbose(`systemUsers successfully served`);
       return systemUsers;

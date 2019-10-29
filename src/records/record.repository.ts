@@ -3,10 +3,14 @@ import { Record } from './record.entity';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-rcord.dto';
 import { Author } from '../authors/author.entity';
-import { GetRecordsFilterDto } from './dto/get-records-filter.dto';
+import {
+  GetRecordsFilterDto,
+  RecordsSortBy,
+} from './dto/get-records-filter.dto';
 import { SystemUser } from '../system-user/system-user.entity';
 import { Request } from 'express';
 import { SystemUserRole } from '../system-user/system-user-role.enum';
+import { SortOrder } from '../utility/sortOrder.enum';
 
 @EntityRepository(Record)
 export class RecordRepository extends Repository<Record> {
@@ -26,6 +30,8 @@ export class RecordRepository extends Repository<Record> {
       updatedStartDate,
       updatedEndDate,
       page,
+      sortBy,
+      sortOrder,
     } = getRecordsFilterDto;
 
     const query = this.createQueryBuilder('record');
@@ -103,7 +109,10 @@ export class RecordRepository extends Repository<Record> {
 
     try {
       const records: Record[] = await query
-        .orderBy('record.id', 'DESC')
+        .orderBy(
+          sortBy ? sortBy : RecordsSortBy.ID,
+          sortOrder ? sortOrder : SortOrder.DESC,
+        )
         .getMany();
       this.logger.verbose(`Records successfully served`);
 
