@@ -3,6 +3,10 @@
 /node_modules
 /docker-volumes
 
+#config
+/pg_dump
+*.backup
+docker-compose.production.yml
 
 # Logs
 logs
